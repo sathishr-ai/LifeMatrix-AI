@@ -1,0 +1,70 @@
+{
+  "users": [
+    {
+      "id": "9f0aa232-9d65-4d61-82f0-47a0d1de67dd",
+      "created_at": "2026-05-07T08:16:05.909503+00:00",
+      "name": "Alex Johnson",
+      "email": "test@example.com",
+      "password": "password123"
+    },
+    {
+      "id": "ba370652-bdba-4105-8175-2def8d8cfa86",
+      "created_at": "2026-05-07T08:34:14.534089+00:00",
+      "name": "Test User",
+      "email": "testcloud@example.com",
+      "password": "password123"
+    },
+    {
+      "id": "c8e14cf9-b593-4275-9336-c7e2be10ad63",
+      "created_at": "2026-05-07T08:35:13.832854+00:00",
+      "name": "Local Test User",
+      "email": "localtest@example.com",
+      "password": "password123"
+    },
+    {
+      "id": "8994e688-980c-4c2b-9602-816d6977196b",
+      "created_at": "2026-05-07T08:43:16.116121+00:00",
+      "name": "Kali",
+      "email": "kali@k.com",
+      "password": "kali123"
+    },
+    {
+      "id": "7a6f8e0e-ed1a-44fd-a55e-b1c07508cb90",
+      "created_at": "2026-05-07T08:44:28.544511+00:00",
+      "name": "Pop",
+      "email": "pop@p.com",
+      "password": "pop123"
+    },
+    {
+      "id": "8b897722-ba1f-4cdf-a675-1d1ad3e7c4d3",
+      "created_at": "2026-05-07T09:13:19.346218+00:00",
+      "name": "Lol",
+      "email": "lol@l.com",
+      "password": "lol123"
+    }
+  ],
+  "userdata": {
+    "test@example.com": {
+      "user_notifications_Akash": "[{\"id\":\"ai-1\",\"sender\":\"AI Diagnostics Engine\",\"date\":\"Today\",\"title\":\"Cardio-respiratory optimization detected. Suggesting active recovery protocol.\",\"type\":\"ai_insight\",\"unread\":false},{\"id\":\"symp-1\",\"sender\":\"Symptom Analyzer\",\"date\":\"Today\",\"title\":\"Your biometric trends show a 15% reduction in overall metabolic stress indicators.\",\"type\":\"insight\",\"unread\":false},{\"id\":\"sync-1\",\"sender\":\"Clinical Lab Sync\",\"date\":\"Today\",\"title\":\"Latest lipid & metabolic panels synced securely with your medical provider.\",\"type\":\"report\",\"unread\":true,\"hasDownload\":true,\"fileName\":\"Lipid_Panel_Report.pdf\"},{\"id\":\"dyn-med\",\"sender\":\"Protocol Scheduler\",\"date\":\"Today\",\"title\":\"Dose schedule synchronized: 1 items active in your clinical timeline.\",\"type\":\"insight\",\"unread\":true,\"hasDownload\":false,\"fileName\":\"\"}]"
+    },
+    "jai@s.com": {
+      "user_notifications_Akash": "[{\"id\":\"ai-1\",\"sender\":\"AI Diagnostics Engine\",\"date\":\"Today\",\"title\":\"Cardio-respiratory optimization detected. Suggesting active recovery protocol.\",\"type\":\"ai_insight\",\"unread\":false},{\"id\":\"symp-1\",\"sender\":\"Symptom Analyzer\",\"date\":\"Today\",\"title\":\"Your biometric trends show a 15% reduction in overall metabolic stress indicators.\",\"type\":\"insight\",\"unread\":false},{\"id\":\"sync-1\",\"sender\":\"Clinical Lab Sync\",\"date\":\"Today\",\"title\":\"Latest lipid & metabolic panels synced securely with your medical provider.\",\"type\":\"report\",\"unread\":true,\"hasDownload\":true,\"fileName\":\"Lipid_Panel_Report.pdf\"}]"
+    },
+    "sathishat2005@gmail.com": {
+      "user_notifications_Akash": "[{\"id\":\"dyn-symptom\",\"sender\":\"Clinical Advisor\",\"date\":\"Today\",\"title\":\"Attention: Active symptoms logged (Fatigue, Nausea, Vomiting, Dizziness). Monitor biometrics closely.\",\"type\":\"warning\",\"unread\":true,\"hasDownload\":false,\"fileName\":\"\"},{\"id\":\"ai-1\",\"sender\":\"AI Diagnostics Engine\",\"date\":\"05/07/2026\",\"title\":\"Cardio-respiratory optimization detected. Suggesting active recovery protocol.\",\"type\":\"ai_insight\",\"unread\":true},{\"id\":\"symp-1\",\"sender\":\"Symptom Analyzer\",\"date\":\"05/07/2026\",\"title\":\"Your biometric trends show a 15% reduction in overall metabolic stress indicators.\",\"type\":\"insight\",\"unread\":false}]"
+    },
+    "joe@j.com": {
+      "user_notifications_Akash": "[]"
+    },
+    "kali@k.com": {
+      "user_notifications_Akash": "[]",
+      "user_notifications_Sathish": "[{\"id\":\"sync-1\",\"sender\":\"Clinical Lab Sync\",\"date\":\"05/07/2026\",\"title\":\"Latest lipid & metabolic panels synced securely with your medical provider.\",\"type\":\"report\",\"unread\":false,\"hasDownload\":true,\"fileName\":\"Lipid_Panel_Report.pdf\"},{\"id\":\"ai-1\",\"sender\":\"AI Diagnostics Engine\",\"date\":\"05/08/2026\",\"title\":\"Cardio-respiratory optimization detected. Suggesting active recovery protocol.\",\"type\":\"ai_insight\",\"unread\":false},{\"id\":\"symp-1\",\"sender\":\"Symptom Analyzer\",\"date\":\"05/08/2026\",\"title\":\"Your biometric trends show a 15% reduction in overall metabolic stress indicators.\",\"type\":\"insight\",\"unread\":false}]"
+    },
+    "cloudtest@example.com": {
+      "user_notifications_Akash": "[]"
+    },
+    "lol@l.com": {
+      "user_notifications_Akash": "[]"
+    }
+  }
+}
