@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router';
 import { useState, useEffect } from 'react';
-import { Heart, Activity, Brain, TrendingUp, Bell, Plus, Calendar, AlertTriangle, LogOut, MapPin, ChevronRight, Sparkles, Zap, Shield, Search, Trash2, Stethoscope, Moon, Droplet, Watch, Phone, PhoneOff, Loader2, X } from 'lucide-react';
+import { Heart, Activity, Brain, TrendingUp, Bell, Plus, Calendar, AlertTriangle, LogOut, MapPin, ChevronRight, Sparkles, Zap, Shield, Search, Trash2, Stethoscope, Moon, Droplet, Watch, Phone, PhoneOff, Loader2, X, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import logo from '../../../assets/logo.png';
@@ -40,6 +40,21 @@ export function HomePage() {
   const [isTransmitting, setIsTransmitting] = useState(false);
   const [transmitStep, setTransmitStep] = useState('');
   const [transmitSuccess, setTransmitSuccess] = useState(false);
+
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Load profile picture from local state (synced from Supabase)
+    const savedPic = localStorage.getItem('user_profile_pic');
+    if (savedPic) setProfilePic(savedPic);
+
+    // Wire up real-time inter-tab or context listener for updates
+    const handlePicChange = (e: any) => {
+      setProfilePic(e.detail);
+    };
+    window.addEventListener('profile-pic-changed' as any, handlePicChange);
+    return () => window.removeEventListener('profile-pic-changed' as any, handlePicChange);
+  }, []);
 
   useEffect(() => {
     let interval: any;
@@ -110,7 +125,7 @@ export function HomePage() {
       let host = window.location.hostname || '127.0.0.1';
       if (host === 'localhost') host = '127.0.0.1';
       
-      await fetch(`http://${host}:5175/api/userdata`, {
+      await fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/userdata` : `http://${host}:5175/api/userdata`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -927,25 +942,48 @@ DISCLAIMER: This clinical report is parsed using LifeMatrix AI secure data inges
           <div className="absolute -bottom-12 -right-12 w-64 h-64 bg-indigo-600/30 rounded-full blur-[80px] animate-pulse pointer-events-none"></div>
           <div className="absolute -top-12 -left-12 w-52 h-52 bg-rose-500/20 rounded-full blur-[60px] animate-pulse pointer-events-none" style={{ animationDuration: '6s' }}></div>
 
-          <div className="relative z-10 flex items-center justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <p className="text-indigo-300 text-[8px] md:text-[11px] font-black uppercase tracking-[0.2em] mb-1.5 leading-none">{currentDate}</p>
-              <h2 className="text-lg md:text-3xl font-black tracking-tight leading-tight mb-2">
-                {greeting}, <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-200">{userName}</span>
-              </h2>
+          <div className="relative z-10 flex items-center justify-between gap-3 md:gap-6">
+            <div className="flex items-center gap-3 md:gap-5 min-w-0 flex-1">
+              {/* HIGH-TECH DASHBOARD PORTRAIT IDENTIFIER */}
+              <div className="relative flex-shrink-0">
+                <div 
+                  onClick={() => navigate('/profile')}
+                  className="w-14 h-14 md:w-20 md:h-20 rounded-2xl md:rounded-[28px] border flex items-center justify-center overflow-hidden shadow-inner cursor-pointer active:scale-95 transition-all duration-300 bg-indigo-950/40 border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.25)] group"
+                >
+                  {profilePic ? (
+                    <img src={profilePic} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="ID" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-indigo-400 to-secondary flex items-center justify-center text-white font-black uppercase text-sm md:text-xl tracking-wider">
+                      {userName.charAt(0)}
+                    </div>
+                  )}
+                </div>
+              </div>
 
-              {/* Dynamic Status Badge */}
-              {healthScore >= 50 ? (
-                <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full w-fit">
-                  <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
-                  <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-emerald-400">BIOMETRICS OPTIMIZED</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 px-3 py-1 bg-rose-500/10 border border-rose-500/20 rounded-full w-fit">
-                  <span className="w-1.5 h-1.5 bg-rose-400 rounded-full animate-ping"></span>
-                  <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-rose-400">PATHOLOGY WARNING</span>
-                </div>
-              )}
+              <div className="min-w-0 flex-1 py-0.5">
+                <p className="text-indigo-300 text-[8px] md:text-[11px] font-black uppercase tracking-[0.2em] mb-1.5 leading-none">{currentDate}</p>
+                <h2 className="min-w-0 mb-2 flex flex-col md:flex-row md:items-baseline md:gap-2">
+                  <span className="block text-xs md:text-3xl font-bold md:font-black text-indigo-200/90 md:text-white leading-tight">
+                    {greeting},
+                  </span>
+                  <span className="block text-lg md:text-3xl font-black tracking-tight leading-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-indigo-100 truncate">
+                    {userName}
+                  </span>
+                </h2>
+
+                {/* Dynamic Status Badge */}
+                {healthScore >= 50 ? (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full w-fit">
+                    <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-ping"></span>
+                    <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-emerald-400">BIOMETRICS OPTIMIZED</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 bg-rose-500/10 border border-rose-500/20 rounded-full w-fit">
+                    <span className="w-1.5 h-1.5 bg-rose-400 rounded-full animate-ping"></span>
+                    <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-rose-400">PATHOLOGY WARNING</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Glowing Circular SVG Health Ring */}
@@ -1004,28 +1042,28 @@ DISCLAIMER: This clinical report is parsed using LifeMatrix AI secure data inges
         </div>
 
         {/* PROFESSIONAL CRITICAL EMERGENCY SOS PANEL */}
-        <div className="mb-4 md:mb-6 bg-rose-50/70 rounded-xl md:rounded-[32px] p-2.5 md:p-5 border border-rose-100 shadow-sm md:shadow-md relative overflow-hidden group">
+        <div className="mb-4 md:mb-6 bg-rose-50/70 rounded-2xl md:rounded-[32px] p-3 md:p-5 border border-rose-100 shadow-sm md:shadow-md relative overflow-hidden group animate-pulse-slow">
           <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-          <div className="absolute -right-12 -top-12 w-36 h-36 bg-rose-400/10 rounded-full blur-2xl opacity-20 animate-pulse pointer-events-none"></div>
+          <div className="absolute -right-12 -top-12 w-36 h-36 bg-rose-400/10 rounded-full blur-2xl opacity-20 pointer-events-none"></div>
           
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 md:gap-4 relative z-10">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-rose-100/60 border border-rose-200/50 flex items-center justify-center animate-pulse flex-shrink-0">
+          <div className="flex items-center justify-between gap-3 relative z-10">
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <div className="w-9.5 h-9.5 md:w-12 md:h-12 rounded-full md:rounded-2xl bg-rose-100/60 border border-rose-200/50 flex items-center justify-center animate-pulse flex-shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)]">
                 <AlertTriangle className="w-4.5 h-4.5 md:w-5.5 md:h-5.5 text-rose-600" />
               </div>
-              <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-600">Emergency Support Active</p>
-                <h3 className="text-base font-black tracking-tight leading-none mt-1 text-rose-900">Critical Medical Response</h3>
-                <p className="text-[10px] text-rose-800/80 font-bold mt-1.5 opacity-90 leading-relaxed">Directly routes your call to the nearest medical emergency dispatch center.</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-[8.5px] md:text-[9px] font-black uppercase tracking-[0.15em] text-rose-600 leading-none whitespace-nowrap">Emergency Active</p>
+                <h3 className="text-[13.5px] md:text-base font-black tracking-tight leading-none mt-1.5 text-rose-900 truncate">Critical Response</h3>
+                <p className="hidden md:block text-[10px] text-rose-800/80 font-bold mt-1.5 opacity-90 leading-relaxed max-w-md">Directly routes your call to the nearest medical emergency dispatch center.</p>
               </div>
             </div>
 
             <button
               onClick={handleCallER}
-              className="py-2 px-4 md:py-3.5 md:px-6 rounded-2xl bg-rose-600 text-white font-black text-xs uppercase tracking-widest shadow-md hover:bg-rose-700 transition-all active:scale-95 cursor-pointer border-none flex items-center justify-center gap-2 self-start sm:self-center"
+              className="px-4 py-2 md:py-3.5 md:px-6 rounded-full md:rounded-2xl bg-rose-600 text-white font-black text-[10.5px] md:text-xs uppercase tracking-wider md:tracking-widest shadow-[0_4px_12px_rgba(225,29,72,0.15)] active:scale-95 transition-all cursor-pointer border-none flex items-center justify-center gap-1.5 flex-shrink-0"
             >
-              <Phone className="w-4 h-4 animate-bounce" />
-              Call 108 Now
+              <Phone className="w-3.5 h-3.5 md:w-4 md:h-4 animate-bounce" />
+              <span>Call Now</span>
             </button>
           </div>
         </div>
@@ -1313,7 +1351,7 @@ DISCLAIMER: This clinical report is parsed using LifeMatrix AI secure data inges
                           handleSyncDevice(device.id);
                         }
                       }}
-                      className={`px-3 py-1.5 rounded-xl font-black text-[9px] uppercase tracking-widest active:scale-95 transition-all cursor-pointer ${
+                      className={`px-3 py-1.5 rounded-xl font-black text-[9px] uppercase tracking-widest active:scale-95 transition-all cursor-pointer transform-gpu will-change-transform ${
                         isConnected
                           ? 'bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-100'
                           : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xs'
@@ -1767,12 +1805,13 @@ DISCLAIMER: This clinical report is parsed using LifeMatrix AI secure data inges
         </div>
 
         {/* INTERACTIVE GLASSMORPHIC TELEMETRY CHART CENTER - Moved below HUD */}
-        <div className="bg-gradient-to-br from-indigo-950/90 via-indigo-950 to-slate-950 rounded-[32px] p-6 border border-white/10 shadow-2xl relative overflow-hidden mb-6 backdrop-blur-xl">
-          {/* Glowing Atmospheric Aura */}
-          <div className={`absolute top-0 right-0 w-80 h-80 rounded-full blur-[100px] pointer-events-none transition-all duration-700 ${
-            activeVitalTab === 'heart' ? 'bg-rose-500/10' :
-            activeVitalTab === 'bp' ? 'bg-blue-500/10' :
-            activeVitalTab === 'sleep' ? 'bg-purple-500/10' : 'bg-cyan-500/10'
+        <div className="bg-gradient-to-br from-indigo-950/95 via-indigo-950 to-slate-950 rounded-[32px] p-6 border border-white/10 shadow-2xl relative overflow-hidden mb-6 transform-gpu will-change-transform">
+          {/* Glowing Atmospheric Aura - Optimized with performance-free radial gradients to avoid Gaussian blur lag */}
+          <div className={`absolute top-0 right-0 w-80 h-80 rounded-full pointer-events-none transition-all duration-700 opacity-50 ${
+            activeVitalTab === 'heart' ? 'bg-[radial-gradient(circle,rgba(244,63,94,0.18)_0%,transparent_70%)]' :
+            activeVitalTab === 'bp' ? 'bg-[radial-gradient(circle,rgba(59,130,246,0.18)_0%,transparent_70%)]' :
+            activeVitalTab === 'sleep' ? 'bg-[radial-gradient(circle,rgba(168,85,247,0.18)_0%,transparent_70%)]' :
+            'bg-[radial-gradient(circle,rgba(6,182,212,0.18)_0%,transparent_70%)]'
           }`}></div>
           
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -1781,8 +1820,8 @@ DISCLAIMER: This clinical report is parsed using LifeMatrix AI secure data inges
               <h3 className="text-lg font-black text-white tracking-tight">Interactive Biometric Trends</h3>
             </div>
             
-            {/* Quick-switch tab bar */}
-            <div className="flex flex-wrap gap-1.5 p-1 bg-white/5 backdrop-blur-md rounded-2xl border border-white/10">
+            {/* Quick-switch tab bar - Blur pruned for scrolling optimization */}
+            <div className="flex flex-wrap gap-1.5 p-1 bg-white/10 rounded-2xl border border-white/10">
               {[
                 { id: 'heart', label: 'Heart Rate', color: 'hover:text-rose-400 active:bg-rose-500/20' },
                 { id: 'bp', label: 'Blood Pressure', color: 'hover:text-blue-400 active:bg-blue-500/20' },
@@ -2300,15 +2339,16 @@ DISCLAIMER: This clinical report is parsed using LifeMatrix AI secure data inges
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-5 bg-indigo-950/60"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-5 bg-indigo-950/60 transform-gpu will-change-transform"
           >
             <motion.div
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="w-full max-w-sm bg-white rounded-[32px] p-6 shadow-2xl border border-white relative overflow-hidden"
+              className="w-full max-w-sm bg-white rounded-[32px] p-6 shadow-2xl border border-white relative overflow-hidden transform-gpu will-change-transform"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50 rounded-full blur-2xl -mr-10 -mt-10"></div>
+              {/* Soft, performance-free glow that avoids costly real-time GPU Gaussian Blurs */}
+              <div className="absolute top-0 right-0 w-32 h-32 rounded-full -mr-10 -mt-10 opacity-60 pointer-events-none bg-[radial-gradient(circle,rgba(99,102,241,0.15)_0%,transparent_70%)]"></div>
 
               <div className="flex items-center justify-between mb-5 relative z-10">
                 <div className="flex items-center gap-2">

@@ -4,11 +4,31 @@ import { useNavigate } from 'react-router';
 import { setStorageItem } from '../../utils/storage';
 
 const symptomsByRegion: Record<string, string[]> = {
-  head: ['Headache', 'Dizziness', 'Fever', 'Sore Throat', 'Runny Nose', 'Ear Pain', 'Vision Blur'],
-  chest: ['Chest Pain', 'Shortness of Breath', 'Cough', 'Heart Palpitations', 'Tightness'],
-  abdomen: ['Stomach Pain', 'Nausea', 'Vomiting', 'Bloating', 'Indigestion'],
-  limbs: ['Muscle Pain', 'Joint Pain', 'Numbness', 'Swelling', 'Weakness'],
-  general: ['Fatigue', 'Chills', 'Night Sweats', 'Weight Loss'],
+  head: [
+    'Headache', 'Dizziness', 'Fever', 'Sore Throat', 'Runny Nose', 'Ear Pain', 'Vision Blur',
+    'Nasal Congestion', 'Tinnitus (Ringing)', 'Eye Redness', 'Toothache', 'Jaw Stiffness', 
+    'Neck Stiffness', 'Loss of Taste/Smell', 'Dry Mouth', 'Face Swelling'
+  ],
+  chest: [
+    'Chest Pain', 'Shortness of Breath', 'Cough', 'Heart Palpitations', 'Tightness',
+    'Wheezing', 'Dry Cough', 'Wet Cough', 'Rapid Heartbeat', 'Shallow Breathing',
+    'Deep Breathing Pain', 'Chest Pressure'
+  ],
+  abdomen: [
+    'Stomach Pain', 'Nausea', 'Vomiting', 'Bloating', 'Indigestion',
+    'Heartburn', 'Loss of Appetite', 'Diarrhea', 'Constipation', 'Acid Reflux',
+    'Abdominal Cramps', 'Stomach Gas'
+  ],
+  limbs: [
+    'Muscle Pain', 'Joint Pain', 'Numbness', 'Swelling', 'Weakness',
+    'Muscle Cramps', 'Hand Tremors', 'Tingling Pins & Needles', 'Ankle Pain', 
+    'Knee Stiffness', 'Back Pain', 'Shoulder Pain', 'Cold Extremities'
+  ],
+  general: [
+    'Fatigue', 'Chills', 'Night Sweats', 'Weight Loss', 'Weight Gain',
+    'Skin Rash', 'Itching / Pruritus', 'Hives', 'Confusion', 'Brain Fog',
+    'Sneezing', 'Body Aches', 'Insomnia', 'Anxiety / Panic', 'Sweating'
+  ],
 };
 
 const commonSymptoms = Array.from(new Set(Object.values(symptomsByRegion).flat()));

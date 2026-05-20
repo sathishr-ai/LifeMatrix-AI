@@ -143,9 +143,21 @@ export function AddMedicine() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.name) return;
-    const existingMeds = JSON.parse(getStorageItem('addedMedications', '[]'));
+    
+    // 1. Resolve Active Logged-In Identity
+    const currentUserStr = localStorage.getItem('currentUser');
+    let userEmail = '';
+    let userName = 'Valued User';
+    if (currentUserStr) {
+      try {
+        const parsed = JSON.parse(currentUserStr);
+        userEmail = parsed.email || '';
+        userName = parsed.name || 'User';
+      } catch (e) {}
+    }
+
     const newMed = {
       id: Date.now(),
       name: formData.name,
@@ -155,8 +167,38 @@ export function AddMedicine() {
       withFood: formData.withFood,
       taken: false
     };
+
+    // 2. Save to native client caches
+    const existingMeds = JSON.parse(getStorageItem('addedMedications', '[]'));
     setStorageItem('addedMedications', JSON.stringify([...existingMeds, newMed]));
     
+    // 3. Forward schedule payload to Node Background Daemon for physical email alarms
+    if (userEmail) {
+      let host = window.location.hostname || '127.0.0.1';
+      const apiHost = host === 'localhost' ? '127.0.0.1' : host;
+
+      (async () => {
+        try {
+          await fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/reminders` : `http://${apiHost}:5175/api/reminders`), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: userEmail,
+              userName: userName,
+              name: formData.name,
+              dosage: formData.dosage,
+              time: formData.time,
+              frequency: formData.frequency,
+              withFood: formData.withFood
+            })
+          });
+          console.log('[REMINDER ENGINE] Successfully synced reminder schedule to Cloud Daemon.');
+        } catch (err) {
+          console.error('[REMINDER ENGINE] Cloud scheduling sync failure:', err);
+        }
+      })();
+    }
+
     // Send signal to Native Expo App for offline scheduling
     if (window.ReactNativeWebView) {
       window.ReactNativeWebView.postMessage(JSON.stringify({
@@ -164,6 +206,13 @@ export function AddMedicine() {
         payload: newMed
       }));
     }
+
+    toast.success('Medication Scheduled', {
+      description: userEmail 
+        ? `📧 Physical email reminders successfully scheduled for ${formData.time}.`
+        : `Local alarm successfully scheduled for ${formData.time}.`,
+      duration: 5000
+    });
     
     navigate('/app/reminders');
   };

@@ -1,7 +1,9 @@
-import { ArrowLeft, User, Bell, Shield, HelpCircle, LogOut, ChevronRight, Settings, Activity, FileText, Pill, Calendar as CalendarIcon, Zap, Globe, Smartphone, Lock, ShieldCheck, Sun, Moon, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, User, Bell, Shield, HelpCircle, LogOut, ChevronRight, Settings, Activity, FileText, Pill, Calendar as CalendarIcon, Zap, Globe, Smartphone, Lock, ShieldCheck, Sun, Moon, Eye, EyeOff, Camera, Trash2, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
+import Cropper from 'react-easy-crop';
+import { getCroppedImg } from '../../utils/canvasUtils';
 import { getStorageItem, removeStorageItem } from '../../utils/storage';
 import logo from '../../../assets/logo.png';
 import myPhoto from '../../../assets/sathish.png';
@@ -29,6 +31,108 @@ export function ProfileScreen() {
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+
+  // Change Mobile Number Feature Port from Sub-menu
+  const [showMobileModal, setShowMobileModal] = useState(false);
+  const [mobileVerifyPass, setMobileVerifyPass] = useState('');
+  const [showMobileVerifyPass, setShowMobileVerifyPass] = useState(false);
+  const [newMobile, setNewMobile] = useState('');
+  const [isMobileUpdating, setIsMobileUpdating] = useState(false);
+
+  // Profile Picture Crop Feature States
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [isCropping, setIsCropping] = useState(false);
+
+  const syncProfilePicToBackend = async (picData: string | null) => {
+    const currentUserStr = localStorage.getItem('currentUser');
+    if (!currentUserStr) return;
+    try {
+      const currentUser = JSON.parse(currentUserStr);
+      const updatedUser = { ...currentUser, profilePic: picData };
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+
+      // Propagate into overall registered users array for persistence across logins
+      const host = window.location.hostname || '127.0.0.1';
+      const apiHost = host === 'localhost' ? '127.0.0.1' : host;
+      const listRes = await fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/users` : `http://${apiHost}:5175/api/users`));
+      if (listRes.ok) {
+        const dat = await listRes.json();
+        const registry = dat.users || [];
+        const filteredRegistry = registry.filter((u: any) => u.email.toLowerCase() !== currentUser.email.toLowerCase());
+        const newRegistry = [...filteredRegistry, updatedUser];
+        
+        // Atomically update the remote JSON storage server
+        await fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/users` : `http://${apiHost}:5175/api/users`), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ users: newRegistry }),
+        });
+        localStorage.setItem('registeredUsers', JSON.stringify(newRegistry));
+      }
+      
+      // 2. Leverage your app's built-in sync.ts global interceptor to automatically propagate this to Supabase Cloud
+      if (picData) {
+        localStorage.setItem('user_profile_pic', picData);
+      } else {
+        localStorage.removeItem('user_profile_pic');
+      }
+      
+      // Instant cross-component event dispatch to dynamically sync global UI structures (like Bottom Nav)
+      window.dispatchEvent(new CustomEvent('profile-pic-changed', { detail: picData }));
+    } catch (err) {
+      console.error('Profile photo remote sync skipped:', err);
+    }
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Invalid Format', { description: 'Please select a valid image file.' });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setImageToCrop(event.target?.result as string);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      setIsCropModalOpen(true);
+      // Clear the input value so selecting the same file triggers onChange again
+      e.target.value = '';
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCropSave = async () => {
+    if (!imageToCrop || !croppedAreaPixels) return;
+    setIsCropping(true);
+    const id = toast.loading('Applying high-fidelity crop...');
+    try {
+      const croppedImage = await getCroppedImg(imageToCrop, croppedAreaPixels);
+      setProfilePic(croppedImage);
+      await syncProfilePicToBackend(croppedImage);
+      toast.success('Profile Photo Updated', { id, description: 'High-definition avatar is now active.' });
+      setIsCropModalOpen(false);
+    } catch (e) {
+      console.error(e);
+      toast.error('Crop Failed', { id, description: 'Could not process the image.' });
+    } finally {
+      setIsCropping(false);
+    }
+  };
+
+  const handleRemoveProfilePic = () => {
+    setProfilePic(null);
+    syncProfilePicToBackend(null);
+    toast.success('Profile Photo Removed', { description: 'Reset back to your clinical fallback initials.' });
+  };
 
   const toggleTheme = () => {
     const nextMode = !isDarkMode;
@@ -57,6 +161,7 @@ export function ProfileScreen() {
         const user = JSON.parse(currentUserStr);
         if (user.name) setUserName(user.name);
         if (user.email) setUserEmail(user.email);
+        if (user.profilePic) setProfilePic(user.profilePic);
       } catch (e) {
         const savedName = localStorage.getItem('user_name');
         const savedEmail = localStorage.getItem('user_email');
@@ -64,6 +169,10 @@ export function ProfileScreen() {
         if (savedEmail) setUserEmail(savedEmail);
       }
     }
+
+    // 2. Auto-load the synced Supabase profile picture from the dedicated local key
+    const syncedPic = localStorage.getItem('user_profile_pic');
+    if (syncedPic) setProfilePic(syncedPic);
 
     // DYNAMIC REDUCTION-BASED SCORING ENGINE (100% BASELINE)
     const localMeds = JSON.parse(getStorageItem('addedMedications', '[]'));
@@ -164,6 +273,19 @@ export function ProfileScreen() {
           color: 'text-amber-600',
           bg: 'bg-amber-50'
         },
+        {
+          icon: Phone,
+          title: 'Change Mobile Number',
+          subtitle: 'Update your registered phone',
+          action: () => {
+            setMobileVerifyPass('');
+            setShowMobileVerifyPass(false);
+            setNewMobile('');
+            setShowMobileModal(true);
+          },
+          color: 'text-teal-600',
+          bg: 'bg-teal-50'
+        },
       ]
     },
     {
@@ -214,20 +336,93 @@ export function ProfileScreen() {
               <div className="relative z-10">
                 {/* IDENTITY ROW */}
                 <div className="flex items-center gap-3 mb-4 md:gap-6 md:mb-8">
-                  <div className="w-14 h-14 md:w-20 md:h-20 rounded-xl md:rounded-3xl bg-gradient-to-br from-indigo-400 to-secondary border border-white/20 flex items-center justify-center shadow-inner overflow-hidden">
-                    <span className="text-white font-black text-2xl md:text-4xl leading-none">{userName.charAt(0).toUpperCase()}</span>
+                  {/* Interactive Custom Photo Avatar Block */}
+                  <div className="relative group/avatar">
+                    <div className="w-14 h-14 md:w-20 md:h-20 rounded-xl md:rounded-3xl bg-gradient-to-br from-indigo-400 to-secondary border flex items-center justify-center shadow-inner overflow-hidden relative transition-all duration-500 border-cyan-400">
+                      {profilePic ? (
+                        <img src={profilePic} className="w-full h-full object-cover" alt={userName} />
+                      ) : (
+                        <span className="text-white font-black text-2xl md:text-4xl leading-none">{userName.charAt(0).toUpperCase()}</span>
+                      )}
+                      
+                      {/* Custom Hover Camera Overlay (Desktop) */}
+                      <label className="absolute inset-0 bg-indigo-950/60 flex items-center justify-center opacity-0 group-hover/avatar:opacity-100 transition-all duration-300 cursor-pointer backdrop-blur-[1px]">
+                        <Camera className="w-5 h-5 text-white" />
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          className="hidden" 
+                          onChange={handleImageUpload} 
+                        />
+                      </label>
+                    </div>
+                    {/* Floating Direct Trigger Icon - Shows when no profile photo exists (both mobile and web) */}
+                    {!profilePic && (
+                      <label className="absolute -bottom-1 -right-1 md:-bottom-1.5 md:-right-1.5 w-5.5 h-5.5 md:w-8 md:h-8 rounded-full border shadow-md flex items-center justify-center cursor-pointer active:scale-90 transition-all bg-cyan-400 border-cyan-300 text-indigo-950 animate-pulse">
+                        <Camera className="w-3 h-3 md:w-4 md:h-4" />
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          className="hidden" 
+                          onChange={handleImageUpload} 
+                        />
+                      </label>
+                    )}
                   </div>
                   <div className="flex-1">
-                    <h2 className="text-sm md:text-2xl font-black tracking-tight">{userName}</h2>
-                    <p className="text-[10px] md:text-sm text-indigo-300/80 font-bold">{userEmail}</p>
-                    <div className="mt-1 flex items-center gap-1.5 md:mt-2 md:gap-3">
-                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      <span className="text-[7px] md:text-[10px] font-black uppercase tracking-widest text-emerald-400">
-                        Sync Active
-                      </span>
+                    <h2 className="text-[18px] md:text-2xl font-black tracking-tight">{userName}</h2>
+                    <p className="text-[12px] md:text-sm text-indigo-200 font-bold mt-0.5 md:mt-0">{userEmail}</p>
+                    <div className="mt-1.5 flex items-center gap-3.5 md:mt-2 flex-wrap">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="text-[8.5px] md:text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                          Sync Active
+                        </span>
+                      </div>
+                      {/* Elegant functional Remove Photo component */}
+                      {profilePic && (
+                        <button 
+                          onClick={handleRemoveProfilePic}
+                          className="flex items-center gap-1 text-[8.5px] md:text-[10px] font-black uppercase tracking-widest text-rose-400 hover:text-rose-300 cursor-pointer border-l border-white/20 pl-3.5 active:scale-95 transition-transform flex-shrink-0"
+                        >
+                          <Trash2 className="w-2.5 h-2.5" />
+                          Remove Profile
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
+
+                {/* Premium Nudge Banner: Encourages uploading a profile photo */}
+                {!profilePic && (
+                  <div className="mb-3.5 md:mb-5 p-2 md:p-3.5 rounded-xl md:rounded-[20px] bg-gradient-to-r from-cyan-400/10 via-cyan-400/5 to-transparent border border-cyan-400/20 flex items-center gap-2 md:gap-3.5 backdrop-blur-md animate-[fadeIn_0.5s_ease-out]">
+                    <div className="w-7 h-7 md:w-9 md:h-9 rounded-lg md:rounded-xl bg-cyan-400/20 flex items-center justify-center text-cyan-400 shrink-0">
+                      <Camera className="w-3.5 h-3.5 md:w-4.5 md:h-4.5 animate-bounce" style={{ animationDuration: '2s' }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1 mb-0.5">
+                        <span className="w-1 h-1 rounded-full bg-cyan-400 animate-ping shrink-0" />
+                        <h4 className="text-[8.5px] md:text-[10px] font-black text-cyan-300 tracking-[0.08em] md:tracking-[0.12em] uppercase">
+                          <span className="md:hidden">Action Required</span>
+                          <span className="hidden md:inline">Security Alert: Incomplete ID</span>
+                        </h4>
+                      </div>
+                      <p className="text-[8.5px] md:text-[10px] text-slate-300 font-semibold leading-tight">
+                        <span className="md:hidden">Upload profile photo to finish setup.</span>
+                        <span className="hidden md:inline">Verify your digital identity. Upload an image to complete your executive profile.</span>
+                      </p>
+                    </div>
+                    <label className="cursor-pointer shrink-0 px-2.5 py-1 md:px-4 md:py-2 rounded-lg md:rounded-xl bg-cyan-400 hover:bg-cyan-300 active:scale-95 text-indigo-950 font-black text-[8px] md:text-[10px] tracking-widest uppercase transition-all shadow-sm md:shadow-lg md:shadow-cyan-500/20 flex items-center justify-center">
+                      Upload
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        onChange={handleImageUpload} 
+                      />
+                    </label>
+                  </div>
+                )}
 
                 {/* METRICS ROW - DYNAMIC TRIO */}
                 <div className="grid grid-cols-3 gap-2 md:gap-4">
@@ -562,7 +757,7 @@ export function ProfileScreen() {
                     const host = window.location.hostname || '127.0.0.1';
                     const apiHost = host === 'localhost' ? '127.0.0.1' : host;
 
-                    const listRes = await fetch(`http://${apiHost}:5175/api/users`);
+                    const listRes = await fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/users` : `http://${apiHost}:5175/api/users`));
                     let registry: any[] = [];
                     if (listRes.ok) {
                       const dat = await listRes.json();
@@ -573,7 +768,7 @@ export function ProfileScreen() {
                     const filteredRegistry = registry.filter((u: any) => u.email.toLowerCase() !== currentUser.email.toLowerCase());
                     const newRegistry = [...filteredRegistry, updatedUser];
 
-                    const updateRes = await fetch(`http://${apiHost}:5175/api/users`, {
+                    const updateRes = await fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/users` : `http://${apiHost}:5175/api/users`), {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ users: newRegistry }),
@@ -608,6 +803,231 @@ export function ProfileScreen() {
                 className="w-full py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-sm disabled:opacity-50 active:scale-95 transition-all"
               >
                 Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* PORTED Change Mobile Number Modal (Outer Integration) */}
+      {showMobileModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            onClick={() => !isMobileUpdating && setShowMobileModal(false)}
+            className="absolute inset-0 bg-black/60 animate-fadeIn"
+          />
+          <div
+            className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-border/50 rounded-[32px] p-8 shadow-2xl overflow-hidden z-10 animate-scaleIn"
+          >
+            <div className="flex flex-col items-center mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 dark:text-teal-400 mb-4 shadow-inner">
+                <Phone className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-black text-indigo-950 dark:text-white tracking-tight">
+                Update Mobile Number
+              </h3>
+              <p className="text-xs text-slate-500 font-medium">Verify identity before updating.</p>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Account Password</label>
+                <div className="relative mt-1">
+                  <input
+                    type={showMobileVerifyPass ? "text" : "password"}
+                    value={mobileVerifyPass}
+                    onChange={(e) => setMobileVerifyPass(e.target.value)}
+                    disabled={isMobileUpdating}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-4 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all dark:text-white"
+                    placeholder="Enter your current password"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowMobileVerifyPass(!showMobileVerifyPass)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-teal-500 transition-colors"
+                  >
+                    {showMobileVerifyPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="w-full h-px bg-slate-100 dark:bg-slate-800"></div>
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">New Mobile Number</label>
+                <div className="relative mt-1">
+                  <input
+                    type="tel"
+                    value={newMobile}
+                    onChange={(e) => setNewMobile(e.target.value)}
+                    disabled={isMobileUpdating}
+                    className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl pl-4 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all dark:text-white"
+                    placeholder="e.g. 9876543210"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <button
+                disabled={isMobileUpdating}
+                onClick={async () => {
+                  if (!mobileVerifyPass) {
+                    toast.error('Required', { description: 'Please enter your account password to verify identity.' });
+                    return;
+                  }
+                  const cleanMobile = newMobile.replace(/\D/g, '');
+                  if (!cleanMobile || cleanMobile.length < 7) {
+                    toast.error('Invalid Number', { description: 'Please enter a valid mobile number (minimum 7 digits).' });
+                    return;
+                  }
+
+                  setIsMobileUpdating(true);
+                  const id = toast.loading('Verifying identity...');
+
+                  try {
+                    const currentUserStr = localStorage.getItem('currentUser');
+                    if (!currentUserStr) throw new Error('No session active.');
+                    const currentUser = JSON.parse(currentUserStr);
+
+                    if (currentUser.password !== mobileVerifyPass) {
+                      throw new Error('Password verification failed. Mobile number not changed.');
+                    }
+
+                    const host = window.location.hostname || '127.0.0.1';
+                    const apiHost = host === 'localhost' ? '127.0.0.1' : host;
+
+                    const listRes = await fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/users` : `http://${apiHost}:5175/api/users`));
+                    let registry: any[] = [];
+                    if (listRes.ok) {
+                      const dat = await listRes.json();
+                      registry = dat.users || [];
+                    }
+
+                    const mobileInUse = registry.some((u: any) =>
+                      u.mobile === cleanMobile && u.email.toLowerCase() !== currentUser.email.toLowerCase()
+                    );
+                    if (mobileInUse) {
+                      throw new Error('This mobile number is already registered to another account.');
+                    }
+
+                    const updatedUser = { ...currentUser, mobile: cleanMobile };
+                    const filteredRegistry = registry.filter((u: any) => u.email.toLowerCase() !== currentUser.email.toLowerCase());
+                    const newRegistry = [...filteredRegistry, updatedUser];
+
+                    const updateRes = await fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/users` : `http://${apiHost}:5175/api/users`), {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ users: newRegistry }),
+                    });
+
+                    if (!updateRes.ok) throw new Error('Cloud synchronization rejected request.');
+
+                    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+                    localStorage.setItem('registeredUsers', JSON.stringify(newRegistry));
+
+                    toast.success('Mobile Number Updated', {
+                      id,
+                      description: `Your number has been changed to ${cleanMobile} and synced securely.`
+                    });
+                    setShowMobileModal(false);
+                  } catch (err: any) {
+                    toast.error('Update Failed', {
+                      id,
+                      description: err.message || 'Mobile number change failed.'
+                    });
+                  } finally {
+                    setIsMobileUpdating(false);
+                  }
+                }}
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white font-bold text-sm shadow-lg disabled:opacity-50 transition-all active:scale-95 flex items-center justify-center"
+              >
+                {isMobileUpdating ? 'Securely Updating...' : 'Commit Mobile Change'}
+              </button>
+              <button
+                disabled={isMobileUpdating}
+                onClick={() => setShowMobileModal(false)}
+                className="w-full py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold text-sm disabled:opacity-50 active:scale-95 transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Premium Profile Picture Zoom/Crop Modal */}
+      {isCropModalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6">
+          <div
+            onClick={() => !isCropping && setIsCropModalOpen(false)}
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-fadeIn"
+          />
+          <div
+            className="relative w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[32px] p-6 shadow-2xl overflow-hidden z-10 animate-scaleIn flex flex-col"
+          >
+            <div className="text-center mb-5">
+              <h3 className="text-xl font-black text-indigo-950 dark:text-white tracking-tight mb-1">
+                Refine Profile Photo
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Drag and zoom image to fit within circular bounds.
+              </p>
+            </div>
+
+            {/* Cropper Viewport Wrapper */}
+            <div className="relative w-full h-72 bg-slate-100 dark:bg-slate-800/50 rounded-[24px] overflow-hidden border border-slate-200 dark:border-slate-700 mb-5 shadow-inner">
+              {imageToCrop && (
+                <Cropper
+                  image={imageToCrop}
+                  crop={crop}
+                  zoom={zoom}
+                  aspect={1}
+                  cropShape="round"
+                  showGrid={false}
+                  onCropChange={setCrop}
+                  onZoomChange={setZoom}
+                  onCropComplete={(_, croppedPixels) => setCroppedAreaPixels(croppedPixels)}
+                />
+              )}
+            </div>
+
+            {/* Slider Control HUD */}
+            <div className="space-y-2.5 mb-6 px-1">
+              <div className="flex justify-between items-center">
+                <span className="text-[9px] font-black tracking-widest uppercase text-slate-400 dark:text-slate-500">Zoom Calibration</span>
+                <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/50 px-2 py-0.5 rounded-full border border-indigo-100/50 dark:border-indigo-900/30">
+                  {zoom.toFixed(1)}x
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500">1.0x</span>
+                <input
+                  type="range"
+                  min={1}
+                  max={3}
+                  step={0.05}
+                  value={zoom}
+                  onChange={(e) => setZoom(Number(e.target.value))}
+                  className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-600 outline-none transition-all"
+                />
+                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500">3.0x</span>
+              </div>
+            </div>
+
+            {/* Interactive Controls */}
+            <div className="flex flex-col gap-2.5">
+              <button
+                disabled={isCropping}
+                onClick={handleCropSave}
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 disabled:opacity-50 transition-all active:scale-95 flex items-center justify-center gap-2"
+              >
+                {isCropping ? 'Locking Pixels...' : 'Save Profile Picture'}
+              </button>
+              <button
+                disabled={isCropping}
+                onClick={() => setIsCropModalOpen(false)}
+                className="w-full py-3.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 font-bold text-sm disabled:opacity-50 active:scale-95 transition-all"
+              >
+                Discard
               </button>
             </div>
           </div>

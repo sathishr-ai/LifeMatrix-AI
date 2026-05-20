@@ -5,42 +5,46 @@
       "created_at": "2026-05-07T08:16:05.909503+00:00",
       "name": "Alex Johnson",
       "email": "test@example.com",
-      "password": "password123"
+      "password": "newpassword123",
+      "mobile": null
     },
     {
-      "id": "ba370652-bdba-4105-8175-2def8d8cfa86",
-      "created_at": "2026-05-07T08:34:14.534089+00:00",
-      "name": "Test User",
-      "email": "testcloud@example.com",
-      "password": "password123"
+      "id": "a31ed588-d7bb-42d5-8de1-da29a30eec42",
+      "created_at": "2026-05-14T11:59:30.789918+00:00",
+      "name": "SATHISH",
+      "email": "sathishat2005@gmail.com",
+      "password": "Sathish1234",
+      "mobile": null
     },
     {
-      "id": "c8e14cf9-b593-4275-9336-c7e2be10ad63",
-      "created_at": "2026-05-07T08:35:13.832854+00:00",
-      "name": "Local Test User",
-      "email": "localtest@example.com",
-      "password": "password123"
+      "id": "12b63567-d7ba-4084-b5e3-2f33b3c17c6a",
+      "created_at": "2026-05-14T12:55:46.120087+00:00",
+      "name": "Preethika",
+      "email": "sjp16105719@gmail.com",
+      "password": "Preethika143",
+      "mobile": null
     },
     {
-      "id": "8994e688-980c-4c2b-9602-816d6977196b",
-      "created_at": "2026-05-07T08:43:16.116121+00:00",
-      "name": "Kali",
-      "email": "kali@k.com",
-      "password": "kali123"
+      "id": "dca984c9-56ce-4c0b-8870-507734473b71",
+      "created_at": "2026-05-15T04:10:16.02868+00:00",
+      "name": "Akash",
+      "email": "whooping487@gmail.com",
+      "password": "Akash1234",
+      "mobile": null
     },
     {
-      "id": "7a6f8e0e-ed1a-44fd-a55e-b1c07508cb90",
-      "created_at": "2026-05-07T08:44:28.544511+00:00",
-      "name": "Pop",
-      "email": "pop@p.com",
-      "password": "pop123"
+      "id": "253e2590-73f2-4bc2-8c0e-02082b3d637f",
+      "created_at": "2026-05-19T16:42:17.219805+00:00",
+      "name": "Jai Ammu",
+      "email": "sathxsh@gmail.com",
+      "password": "Jaiammu143",
+      "mobile": null
     },
     {
-      "id": "8b897722-ba1f-4cdf-a675-1d1ad3e7c4d3",
-      "created_at": "2026-05-07T09:13:19.346218+00:00",
-      "name": "Lol",
-      "email": "lol@l.com",
-      "password": "lol123"
+      "name": "Joe",
+      "email": "joe@gmail.com",
+      "mobile": "9600078226",
+      "password": "joe123"
     }
   ],
   "userdata": {
@@ -51,7 +55,8 @@
       "user_notifications_Akash": "[{\"id\":\"ai-1\",\"sender\":\"AI Diagnostics Engine\",\"date\":\"Today\",\"title\":\"Cardio-respiratory optimization detected. Suggesting active recovery protocol.\",\"type\":\"ai_insight\",\"unread\":false},{\"id\":\"symp-1\",\"sender\":\"Symptom Analyzer\",\"date\":\"Today\",\"title\":\"Your biometric trends show a 15% reduction in overall metabolic stress indicators.\",\"type\":\"insight\",\"unread\":false},{\"id\":\"sync-1\",\"sender\":\"Clinical Lab Sync\",\"date\":\"Today\",\"title\":\"Latest lipid & metabolic panels synced securely with your medical provider.\",\"type\":\"report\",\"unread\":true,\"hasDownload\":true,\"fileName\":\"Lipid_Panel_Report.pdf\"}]"
     },
     "sathishat2005@gmail.com": {
-      "user_notifications_Akash": "[{\"id\":\"dyn-symptom\",\"sender\":\"Clinical Advisor\",\"date\":\"Today\",\"title\":\"Attention: Active symptoms logged (Fatigue, Nausea, Vomiting, Dizziness). Monitor biometrics closely.\",\"type\":\"warning\",\"unread\":true,\"hasDownload\":false,\"fileName\":\"\"},{\"id\":\"ai-1\",\"sender\":\"AI Diagnostics Engine\",\"date\":\"05/07/2026\",\"title\":\"Cardio-respiratory optimization detected. Suggesting active recovery protocol.\",\"type\":\"ai_insight\",\"unread\":true},{\"id\":\"symp-1\",\"sender\":\"Symptom Analyzer\",\"date\":\"05/07/2026\",\"title\":\"Your biometric trends show a 15% reduction in overall metabolic stress indicators.\",\"type\":\"insight\",\"unread\":false}]"
+      "user_notifications_Akash": "[{\"id\":\"dyn-symptom\",\"sender\":\"Clinical Advisor\",\"date\":\"Today\",\"title\":\"Attention: Active symptoms logged (Fatigue, Nausea, Vomiting, Dizziness). Monitor biometrics closely.\",\"type\":\"warning\",\"unread\":true,\"hasDownload\":false,\"fileName\":\"\"},{\"id\":\"ai-1\",\"sender\":\"AI Diagnostics Engine\",\"date\":\"05/07/2026\",\"title\":\"Cardio-respiratory optimization detected. Suggesting active recovery protocol.\",\"type\":\"ai_insight\",\"unread\":true},{\"id\":\"symp-1\",\"sender\":\"Symptom Analyzer\",\"date\":\"05/07/2026\",\"title\":\"Your biometric trends show a 15% reduction in overall metabolic stress indicators.\",\"type\":\"insight\",\"unread\":false}]",
+      "user_notifications_Sathish": "[]"
     },
     "joe@j.com": {
       "user_notifications_Akash": "[]"
@@ -65,6 +70,26 @@
     },
     "lol@l.com": {
       "user_notifications_Akash": "[]"
+    },
+    "spj161057@gmail.com": {
+      "user_notifications_Sathish": "[]",
+      "spj161057@gmail.com_privacy_anon_data": "false",
+      "spj161057@gmail.com_privacy_biometrics": "true"
+    },
+    "whooping487@gmail.com": {
+      "user_notifications_Sathish": "[]"
+    },
+    "sathxsh@gmail.com": {
+      "user_notifications_Sathish": "[]"
+    },
+    "joe@gmail.com": {
+      "user_notifications_Sathish": "[]"
+    },
+    "sjp16105719@gmail.com": {
+      "user_notifications_Sathish": "[]"
+    },
+    "sathxsh57@gmail.com": {
+      "user_notifications_Sathish": "[]"
     }
   }
 }

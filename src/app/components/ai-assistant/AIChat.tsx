@@ -2,6 +2,7 @@ import { ArrowLeft, Send, Mic, Sparkles, Trash2, Brain, Activity, Zap, Salad, Du
 import { useNavigate } from 'react-router';
 import { useState, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'motion/react';
 
 export function AIChat() {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ export function AIChat() {
 
   const [message, setMessage] = useState('');
   const [apiKey] = useState(
-    import.meta.env.VITE_OPENROUTER_API_KEY || localStorage.getItem('openrouter_api_key') || ''
+    (import.meta as any).env.VITE_OPENROUTER_API_KEY || localStorage.getItem('openrouter_api_key') || ''
   );
   const [isTyping, setIsTyping] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -372,11 +373,15 @@ export function AIChat() {
       {/* CHAT INTERFACE - OPTIMIZED WIDTH & SPACING */}
       <div className="flex-1 overflow-auto px-3.5 py-4 md:px-8 md:py-6 pb-4 relative z-10 max-w-5xl mx-auto w-full">
         <div className="space-y-5 md:space-y-8 mb-8">
-          {messages.map((msg: any, index: number) => (
-            <div
-              key={index}
-              className={`flex items-start gap-2.5 md:gap-4 ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}
-            >
+          <AnimatePresence>
+            {messages.map((msg: any, index: number) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 260, damping: 25 }}
+                className={`flex items-start gap-2.5 md:gap-4 ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}
+              >
               <div className={`w-9 h-9 md:w-10 md:h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-md border border-white/50 ${msg.type === 'user' ? 'bg-gradient-to-br from-indigo-600 to-purple-600' : 'bg-white'
                 }`}>
                 {msg.type === 'user' ? <Zap className="w-4 h-4 md:w-5 md:h-5 text-white" /> : <Brain className="w-4 h-4 md:w-5 md:h-5 text-secondary" />}
@@ -440,11 +445,17 @@ export function AIChat() {
                   )}
                 </div>
               </div>
-            </div>
-          ))}
+            </motion.div>
+            ))}
 
-          {isTyping && (
-            <div className="flex items-start gap-2.5 md:gap-4">
+            {isTyping && (
+              <motion.div 
+                initial={{ opacity: 0, y: 15, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.2 }}
+                className="flex items-start gap-2.5 md:gap-4"
+              >
               <div className="w-9 h-9 md:w-10 md:h-10 rounded-2xl bg-white flex items-center justify-center flex-shrink-0 shadow-md border border-white/50">
                 <Brain className="w-4 h-4 md:w-5 md:h-5 text-secondary animate-pulse" />
               </div>
@@ -455,14 +466,15 @@ export function AIChat() {
                   <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full animate-bounce [animation-delay:0.4s]"></div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
 
           <div ref={chatEndRef} />
         </div>
 
         {/* PREMIUM QUICK SUGGESTIONS - BOTTOM POSITIONED EMPTY STATE ONLY */}
-        {!isTyping && !messages.some(m => m.type === 'user') && (
+        {!isTyping && !messages.some((m: any) => m.type === 'user') && (
           <div className="pb-4 animate-fade-in">
             <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-4 ml-1">Suggested Queries</p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
@@ -472,8 +484,13 @@ export function AIChat() {
                 { text: 'Trajectory', sub: 'EXPLAIN CURRENT', icon: TrendingUp, color: 'text-blue-600', bg: 'bg-blue-50/50' },
                 { text: 'Exercise', sub: 'BIO-OPTIMIZED', icon: Dumbbell, color: 'text-purple-600', bg: 'bg-purple-50/50' },
               ].map((item, index) => (
-                <button
+                <motion.button
                   key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, type: "spring", stiffness: 200, damping: 20 }}
+                  whileHover={{ scale: 1.03, y: -2 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={() => {
                     const fullQueries: Record<string, string> = {
                       'Risk Factors': 'Analyze my latest risk factors',
@@ -483,7 +500,7 @@ export function AIChat() {
                     };
                     setMessage(fullQueries[item.text]);
                   }}
-                  className="group relative bg-white rounded-2xl p-4 border border-slate-100 shadow-sm transition-all hover:bg-slate-50 hover:-translate-y-0.5 active:scale-95 text-left flex flex-col gap-2.5 overflow-hidden"
+                  className="group relative bg-white rounded-2xl p-4 border border-slate-100 shadow-sm text-left flex flex-col gap-2.5 overflow-hidden cursor-pointer"
                 >
                   <div className={`w-10 h-10 rounded-2xl ${item.bg} flex items-center justify-center ${item.color} shadow-sm group-hover:scale-110 transition-transform relative z-10`}>
                     <item.icon className="w-5 h-5" />
@@ -493,7 +510,7 @@ export function AIChat() {
                     <h4 className="text-[12px] font-black text-indigo-950 tracking-tight leading-tight group-hover:text-secondary transition-colors">{item.text}</h4>
                   </div>
                   <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-gradient-to-br from-transparent to-indigo-50/30 rounded-full blur-xl"></div>
-                </button>
+                </motion.button>
               ))}
             </div>
           </div>

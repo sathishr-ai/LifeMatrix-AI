@@ -1,7 +1,8 @@
 // Transparent synchronization client for Web & Mobile
 // Intercepts localStorage operations to automatically synchronize data with the backend sync server
 
-const getApiUrl = (path: string) => {
+export const getApiUrl = (path: string) => {
+  if (import.meta.env.VITE_API_URL) return `${import.meta.env.VITE_API_URL}/api${path}`;
   let host = window.location.hostname || '127.0.0.1';
   if (host === 'localhost') {
     host = '127.0.0.1';
@@ -36,6 +37,10 @@ async function syncUserFromServer(email: string) {
         Object.entries(data).forEach(([key, value]) => {
           if (typeof value === 'string') {
             originalSetItem.call(window.localStorage, key, value);
+            // Instantly broadcast key updates to React UI widgets
+            if (key === 'user_profile_pic') {
+              window.dispatchEvent(new CustomEvent('profile-pic-changed', { detail: value }));
+            }
           }
         });
       }
@@ -88,6 +93,21 @@ window.localStorage.setItem = function (key: string, value: string) {
 
 // 3. Override removeItem to transparently sync deletions to backend
 window.localStorage.removeItem = function (key: string) {
+  // 🛡️ CRITICAL SESSION ISOLATION ARMOR:
+  // If the user is logging out (wiping 'currentUser'), immediately purge ALL user-scoped local keys
+  // (profile picture, symptoms, logs) to prevent any cross-contamination with the next logged-in user!
+  if (key === 'currentUser') {
+    try {
+      Object.keys(window.localStorage).forEach(k => {
+        if (k !== 'registeredUsers' && k !== 'theme' && k !== 'currentUser') {
+          originalRemoveItem.call(window.localStorage, k);
+        }
+      });
+      // Reset all active global reactive UI state
+      window.dispatchEvent(new CustomEvent('profile-pic-changed', { detail: null }));
+    } catch (err) {}
+  }
+
   originalRemoveItem.apply(this, arguments as any);
 
   if (isSyncingFromServer) return;

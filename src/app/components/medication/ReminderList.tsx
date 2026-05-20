@@ -24,12 +24,38 @@ export function ReminderList() {
   }, []);
 
   const handleDelete = (id: any) => {
+    const deletedItem = reminders.find((r) => r.id === id);
+
     const updated = reminders.filter((r) => r.id !== id);
     setReminders(updated);
 
     const localMeds = JSON.parse(getStorageItem('addedMedications', '[]'));
     const filteredMeds = localMeds.filter((m: any) => m.id !== id);
     setStorageItem('addedMedications', JSON.stringify(filteredMeds));
+
+    // Push cancellation back to background server daemon
+    if (deletedItem) {
+      const currentUserStr = localStorage.getItem('currentUser');
+      if (currentUserStr) {
+        try {
+          const parsed = JSON.parse(currentUserStr);
+          const userEmail = parsed.email || '';
+          if (userEmail) {
+            let host = window.location.hostname || '127.0.0.1';
+            const apiHost = host === 'localhost' ? '127.0.0.1' : host;
+            
+            fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/reminders` : `http://${apiHost}:5175/api/reminders`), {
+              method: 'DELETE',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: userEmail,
+                name: deletedItem.medication
+              })
+            }).catch(e => console.error('[REMINDER ENGINE] Sync delete error:', e));
+          }
+        } catch(e) {}
+      }
+    }
   };
 
   const handleToggle = (id: any) => {

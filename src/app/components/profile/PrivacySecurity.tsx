@@ -1,4 +1,4 @@
-import { ArrowLeft, Shield, Lock, Fingerprint, Eye, EyeOff, FileText, ChevronRight, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Shield, Lock, Fingerprint, Eye, EyeOff, FileText, ChevronRight, AlertTriangle, Phone } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -22,6 +22,17 @@ export function PrivacySecurity() {
   const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  
+  // Delete Confirmation Password State
+  const [deleteConfirmPass, setDeleteConfirmPass] = useState('');
+  const [showDeleteConfirmPass, setShowDeleteConfirmPass] = useState(false);
+
+  // Change Mobile Number State
+  const [showMobileModal, setShowMobileModal] = useState(false);
+  const [mobileVerifyPass, setMobileVerifyPass] = useState('');
+  const [showMobileVerifyPass, setShowMobileVerifyPass] = useState(false);
+  const [newMobile, setNewMobile] = useState('');
+  const [isMobileUpdating, setIsMobileUpdating] = useState(false);
 
   useEffect(() => {
     setStorageItem('privacy_biometrics', biometrics.toString());
@@ -155,6 +166,29 @@ export function PrivacySecurity() {
                   Update
                 </button>
               </div>
+
+              <div className="p-5 flex items-center justify-between border-t border-border/50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600">
+                    <Phone className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-foreground">Change Mobile Number</p>
+                    <p className="text-[10px] text-muted-foreground font-medium">Update your registered phone</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => {
+                    setMobileVerifyPass('');
+                    setShowMobileVerifyPass(false);
+                    setNewMobile('');
+                    setShowMobileModal(true);
+                  }}
+                  className="text-xs font-bold text-teal-600 hover:underline bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm"
+                >
+                  Update
+                </button>
+              </div>
             </div>
           </section>
 
@@ -222,7 +256,11 @@ export function PrivacySecurity() {
           
           <div className="pt-4 text-center">
             <button 
-              onClick={() => setShowDeleteModal(true)}
+              onClick={() => {
+                setDeleteConfirmPass('');
+                setShowDeleteConfirmPass(false);
+                setShowDeleteModal(true);
+              }}
               className="flex items-center gap-2 mx-auto text-xs font-bold text-red-500 hover:text-red-600 py-2.5 px-5 rounded-xl border border-red-100 bg-red-50/50 transition-all active:scale-95"
             >
               <AlertTriangle className="w-4 h-4" />
@@ -257,30 +295,64 @@ export function PrivacySecurity() {
                 Erase Health Vault?
               </h3>
               
-              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-8">
+              <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-6">
                 This will <span className="text-rose-500 font-bold">permanently delete</span> all your biometric logs, symptom histories, medication tracking, and active sessions. This action is absolute and cannot be undone.
               </p>
+
+              {/* High-Security Password Verification Input */}
+              <div className="w-full text-left mb-6">
+                <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Verify Your Identity</label>
+                <div className="relative mt-1">
+                  <input 
+                    type={showDeleteConfirmPass ? "text" : "password"} 
+                    value={deleteConfirmPass}
+                    onChange={(e) => setDeleteConfirmPass(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all"
+                    placeholder="Enter account password to confirm"
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => setShowDeleteConfirmPass(!showDeleteConfirmPass)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 transition-colors"
+                  >
+                    {showDeleteConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
 
               {/* Buttons */}
               <div className="flex flex-col w-full gap-3">
                 <button
                   onClick={async () => {
                     const currentUserStr = localStorage.getItem('currentUser');
-                    if (currentUserStr) {
-                      try {
-                        const currentUser = JSON.parse(currentUserStr);
-                        if (currentUser && currentUser.email) {
-                          const host = window.location.hostname || '127.0.0.1';
-                          const apiHost = host === 'localhost' ? '127.0.0.1' : host;
-                          await fetch(`http://${apiHost}:5175/api/users/delete`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email: currentUser.email }),
-                          });
-                        }
-                      } catch (err) {
-                        console.warn('Failed to delete user on server:', err);
+                    if (!currentUserStr) return;
+                    
+                    try {
+                      const currentUser = JSON.parse(currentUserStr);
+                      
+                      // 🚨 High-Security Block: Force Identity Validation
+                      if (!deleteConfirmPass) {
+                        toast.error('Required', { description: 'Please enter your account password to confirm.' });
+                        return;
                       }
+                      
+                      if (currentUser.password !== deleteConfirmPass) {
+                        toast.error('Incorrect Password', { description: 'Identity verification failed. The data vault remains secure.' });
+                        return;
+                      }
+
+                      // Proceed to complete deletion sync
+                      if (currentUser.email) {
+                        const host = window.location.hostname || '127.0.0.1';
+                        const apiHost = host === 'localhost' ? '127.0.0.1' : host;
+                        await fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/users/delete` : `http://${apiHost}:5175/api/users/delete`), {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ email: currentUser.email }),
+                        });
+                      }
+                    } catch (err) {
+                      console.warn('Failed to delete user on server:', err);
                     }
 
                     localStorage.clear();
@@ -423,7 +495,7 @@ export function PrivacySecurity() {
                     const apiHost = host === 'localhost' ? '127.0.0.1' : host;
 
                     // 2. Pull latest user list from Cloud/Backend Sync Server
-                    const listRes = await fetch(`http://${apiHost}:5175/api/users`);
+                    const listRes = await fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/users` : `http://${apiHost}:5175/api/users`));
                     let registry: any[] = [];
                     if (listRes.ok) {
                       const dat = await listRes.json();
@@ -436,7 +508,7 @@ export function PrivacySecurity() {
                     const newRegistry = [...filteredRegistry, updatedUser];
 
                     // 4. Push atomic Upsert Payload to Cloud/Local backend pipeline
-                    const updateRes = await fetch(`http://${apiHost}:5175/api/users`, {
+                    const updateRes = await fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/users` : `http://${apiHost}:5175/api/users`), {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ users: newRegistry }),
@@ -471,6 +543,156 @@ export function PrivacySecurity() {
               <button
                 disabled={isUpdating}
                 onClick={() => setShowPasswordModal(false)}
+                className="w-full py-3.5 rounded-2xl bg-slate-100 text-slate-700 font-bold text-sm disabled:opacity-50 active:scale-95 transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Change Mobile Number Modal */}
+      {showMobileModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            onClick={() => !isMobileUpdating && setShowMobileModal(false)}
+            className="absolute inset-0 bg-black/60 animate-fadeIn"
+          />
+          <div
+            className="relative w-full max-w-md bg-white dark:bg-card border border-border/50 rounded-[32px] p-8 shadow-2xl overflow-hidden z-10 animate-scaleIn"
+          >
+            <div className="flex flex-col items-center mb-6">
+              <div className="w-14 h-14 rounded-2xl bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center text-teal-600 dark:text-teal-400 mb-4 shadow-inner">
+                <Phone className="w-7 h-7" />
+              </div>
+              <h3 className="text-xl font-black text-indigo-950 dark:text-white tracking-tight">
+                Update Mobile Number
+              </h3>
+              <p className="text-xs text-slate-500 font-medium">Verify identity before updating.</p>
+            </div>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Account Password</label>
+                <div className="relative mt-1">
+                  <input 
+                    type={showMobileVerifyPass ? "text" : "password"} 
+                    value={mobileVerifyPass}
+                    onChange={(e) => setMobileVerifyPass(e.target.value)}
+                    disabled={isMobileUpdating}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-10 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all"
+                    placeholder="Enter your current password"
+                  />
+                  <button 
+                    type="button"
+                    onClick={() => setShowMobileVerifyPass(!showMobileVerifyPass)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-teal-500 transition-colors"
+                  >
+                    {showMobileVerifyPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="w-full h-px bg-slate-100"></div>
+              <div>
+                <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">New Mobile Number</label>
+                <div className="relative mt-1">
+                  <input 
+                    type="tel"
+                    value={newMobile}
+                    onChange={(e) => setNewMobile(e.target.value)}
+                    disabled={isMobileUpdating}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-4 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 transition-all"
+                    placeholder="e.g. 9876543210"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <button
+                disabled={isMobileUpdating}
+                onClick={async () => {
+                  if (!mobileVerifyPass) {
+                    toast.error('Required', { description: 'Please enter your account password to verify identity.' });
+                    return;
+                  }
+                  const cleanMobile = newMobile.replace(/\D/g, '');
+                  if (!cleanMobile || cleanMobile.length < 7) {
+                    toast.error('Invalid Number', { description: 'Please enter a valid mobile number (minimum 7 digits).' });
+                    return;
+                  }
+
+                  setIsMobileUpdating(true);
+                  const id = toast.loading('Verifying identity...');
+
+                  try {
+                    const currentUserStr = localStorage.getItem('currentUser');
+                    if (!currentUserStr) throw new Error('No session active.');
+                    const currentUser = JSON.parse(currentUserStr);
+
+                    // Security: Verify password before allowing mobile change
+                    if (currentUser.password !== mobileVerifyPass) {
+                      throw new Error('Password verification failed. Mobile number not changed.');
+                    }
+
+                    const host = window.location.hostname || '127.0.0.1';
+                    const apiHost = host === 'localhost' ? '127.0.0.1' : host;
+
+                    // Pull latest user registry from backend
+                    const listRes = await fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/users` : `http://${apiHost}:5175/api/users`));
+                    let registry: any[] = [];
+                    if (listRes.ok) {
+                      const dat = await listRes.json();
+                      registry = dat.users || [];
+                    }
+
+                    // Check if mobile number is already taken by another user
+                    const mobileInUse = registry.some((u: any) => 
+                      u.mobile === cleanMobile && u.email.toLowerCase() !== currentUser.email.toLowerCase()
+                    );
+                    if (mobileInUse) {
+                      throw new Error('This mobile number is already registered to another account.');
+                    }
+
+                    // Update user record
+                    const updatedUser = { ...currentUser, mobile: cleanMobile };
+                    const filteredRegistry = registry.filter((u: any) => u.email.toLowerCase() !== currentUser.email.toLowerCase());
+                    const newRegistry = [...filteredRegistry, updatedUser];
+
+                    // Push to backend / Supabase
+                    const updateRes = await fetch((import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/users` : `http://${apiHost}:5175/api/users`), {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ users: newRegistry }),
+                    });
+
+                    if (!updateRes.ok) throw new Error('Cloud synchronization rejected request.');
+
+                    // Finalize locally
+                    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+                    localStorage.setItem('registeredUsers', JSON.stringify(newRegistry));
+
+                    toast.success('Mobile Number Updated', {
+                      id,
+                      description: `Your number has been changed to ${cleanMobile} and synced securely.`
+                    });
+                    setShowMobileModal(false);
+                  } catch (err: any) {
+                    toast.error('Update Failed', {
+                      id,
+                      description: err.message || 'Mobile number change failed.'
+                    });
+                  } finally {
+                    setIsMobileUpdating(false);
+                  }
+                }}
+                className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white font-bold text-sm shadow-lg disabled:opacity-50 transition-all active:scale-95 flex items-center justify-center"
+              >
+                {isMobileUpdating ? 'Securely Updating...' : 'Commit Mobile Change'}
+              </button>
+              <button
+                disabled={isMobileUpdating}
+                onClick={() => setShowMobileModal(false)}
                 className="w-full py-3.5 rounded-2xl bg-slate-100 text-slate-700 font-bold text-sm disabled:opacity-50 active:scale-95 transition-all"
               >
                 Cancel

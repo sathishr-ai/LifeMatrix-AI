@@ -14,7 +14,7 @@ export function AIProcessing() {
   }, [navigate]);
 
   return (
-    <div className="size-full bg-gradient-to-br from-primary via-primary to-secondary flex items-center justify-center px-6 relative overflow-hidden">
+    <div className="w-full min-h-screen bg-gradient-to-br from-[#0A1F44] via-[#0A1F44] to-[#00C6A7] flex items-center justify-center px-6 relative overflow-hidden">
       {/* Back Button */}
       <button 
         onClick={() => navigate(-1)}
@@ -48,40 +48,41 @@ export function AIProcessing() {
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-2xl text-white mb-4"
+          className="text-2xl font-black tracking-tight text-white mb-3"
         >
-          Analyzing Your Symptoms
+          AI HEALTH SCANNING
         </motion.h1>
 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="text-white/80 mb-8 max-w-sm mx-auto"
+          className="text-[10px] font-bold tracking-wider uppercase text-white/60 mb-8 max-w-xs mx-auto leading-relaxed"
         >
-          Our AI is processing your data and cross-referencing medical databases...
+          Cross-referencing your symptoms with verified medical databases
         </motion.p>
 
         <div className="space-y-3 max-w-xs mx-auto">
           {[
-            { text: 'Analyzing symptom patterns', delay: 0 },
-            { text: 'Checking health history', delay: 0.5 },
-            { text: 'Calculating risk factors', delay: 1 },
+            { text: 'Analyzing Symptom Patterns', delay: 0 },
+            { text: 'Reviewing Health History', delay: 0.5 },
+            { text: 'Calculating Clinical Matches', delay: 1 },
           ].map((item, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: item.delay, duration: 0.5 }}
-              className="flex items-center gap-3 bg-white/10 backdrop-blur rounded-xl p-3"
+              className="flex items-center gap-3 bg-white/10 backdrop-blur-md border border-white/10 rounded-2xl p-3.5 shadow-sm"
             >
               <motion.div
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0 border border-white/10"
               >
-                <Activity className="w-5 h-5 text-white" />
+                <Activity className="w-4 h-4 text-white" />
               </motion.div>
-              <span className="text-white text-sm">{item.text}</span>
+              <span className="text-white font-black tracking-wide text-[10.5px] uppercase text-left">{item.text}</span>
             </motion.div>
           ))}
         </div>

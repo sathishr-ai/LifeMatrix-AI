@@ -9,11 +9,13 @@ export function HealthProfileDashboard() {
   // Retrieve active logged in user's profile details
   const currentUserStr = localStorage.getItem('currentUser');
   let initialName = 'Alex Johnson';
+  let initialPic = null;
   let currentUserObj: any = {};
   if (currentUserStr) {
     try {
       currentUserObj = JSON.parse(currentUserStr);
       if (currentUserObj.name) initialName = currentUserObj.name;
+      if (currentUserObj.profilePic) initialPic = currentUserObj.profilePic;
     } catch (e) {}
   }
 
@@ -39,6 +41,7 @@ export function HealthProfileDashboard() {
   const [bloodPressure, setBloodPressure] = useState(initialLogs.bloodPressure || '120/80');
   const [heartRate, setHeartRate] = useState(initialLogs.heartRate || '72');
   const [bloodType, setBloodType] = useState(initialBloodType);
+  const [profilePic, setProfilePic] = useState<string | null>(initialPic);
 
   const bmi = (weight / Math.pow(height / 100, 2)).toFixed(1);
 
@@ -105,7 +108,11 @@ export function HealthProfileDashboard() {
             {/* IDENTITY SECTION */}
             <div className="flex items-center gap-3 md:gap-8">
               <div className="w-12 h-12 md:w-28 md:h-28 rounded-xl md:rounded-[40px] bg-gradient-to-br from-indigo-400 to-secondary border border-white/20 flex items-center justify-center shadow-inner overflow-hidden">
-                 <span className="text-white font-black text-xl md:text-5xl leading-none">{name.charAt(0).toUpperCase()}</span>
+                 {profilePic ? (
+                   <img src={profilePic} className="w-full h-full object-cover" alt={name} />
+                 ) : (
+                   <span className="text-white font-black text-xl md:text-5xl leading-none">{name.charAt(0).toUpperCase()}</span>
+                 )}
               </div>
               <div className="flex-1">
                 {isEditing ? (
@@ -117,7 +124,7 @@ export function HealthProfileDashboard() {
                   />
                 ) : (
                   <>
-                    <h2 className="text-sm md:text-4xl font-black tracking-tight mb-0.5 md:mb-2">{name}</h2>
+                    <h2 className="text-[18px] md:text-4xl font-black tracking-tight mb-0.5 md:mb-2">{name}</h2>
                     <div className="flex items-center gap-1.5 md:gap-4">
                        <div className="px-1.5 py-0.5 rounded-full bg-indigo-400/10 border border-indigo-400/20 text-indigo-300 text-[6px] md:text-[11px] font-black uppercase tracking-widest">
                          Active

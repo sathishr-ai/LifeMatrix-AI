@@ -1,4 +1,13 @@
-import { createBrowserRouter } from "react-router";
+import { createBrowserRouter, Navigate } from "react-router";
+
+// Professional Auth Guard: Prevents unauthorized direct URL access
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const currentUser = localStorage.getItem("currentUser");
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+  return <>{children}</>;
+};
 import { Root } from "./components/Root";
 import { SplashScreen } from "./components/auth/SplashScreen";
 import { OnboardingScreen } from "./components/auth/OnboardingScreen";
@@ -74,7 +83,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/app",
-    element: <Root />,
+    element: (
+      <ProtectedRoute>
+        <Root />
+      </ProtectedRoute>
+    ),
     children: [
       { index: true, element: <HomePage /> },
       { path: "health-profile", element: <HealthProfileDashboard /> },
