@@ -730,6 +730,7 @@ const server = http.createServer(async (req, res) => {
                   method: 'POST',
                   body: JSON.stringify({
                     to: email,
+                    name: 'LifeMatrix AI',
                     subject: '🔐 Access Code: LifeMatrix Secure Handshake',
                     html: emailHtml
                   })
@@ -863,6 +864,7 @@ setInterval(async () => {
             method: 'POST',
             body: JSON.stringify({
               to: r.email,
+              name: 'LifeMatrix Care',
               subject: mailOptions.subject,
               html: emailHtml
             })
