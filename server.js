@@ -20,6 +20,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // ==========================================================
 const GMAIL_USER = "sathishat2005@gmail.com";
 const GMAIL_APP_PASSWORD = "rckb iepq qjss pyrg"; // PASTE YOUR 16-LETTER GOOGLE APP PASSWORD HERE
+const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxmRhA-Zv6llh9gLWgKkajWSUg1kxIHRxgihb-hBHumBFQguizMz84xf9LP4wXUUsK9jA/exec"; // Paste the Google Apps Script Web App URL here
 // ==========================================================
 
 function buildBrandedEmailHtml(code) {
@@ -723,23 +724,36 @@ const server = http.createServer(async (req, res) => {
             };
 
             try {
-              await transporter.sendMail(mailOptions);
+              if (GOOGLE_APPS_SCRIPT_URL) {
+                console.log('[SECURITY NODE] 🚀 Using Google Apps Script HTTP Bypass...');
+                const gasRes = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                  method: 'POST',
+                  body: JSON.stringify({
+                    to: email,
+                    subject: '🔐 Access Code: LifeMatrix Secure Handshake',
+                    html: emailHtml
+                  })
+                });
+                if (!gasRes.ok) throw new Error('Apps Script rejected request');
+              } else {
+                await transporter.sendMail(mailOptions);
+              }
               console.log(`[SECURITY NODE] ✅ Physical email successfully delivered via Google Secure Relay.`);
               res.statusCode = 200;
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify({ success: true, delivered: true }));
             } catch (deliveryErr) {
-              console.error('[SECURITY NODE] ❌ Google SMTP rejected transmission:', deliveryErr.message);
+              console.error('[SECURITY NODE] ❌ Transmission failed:', deliveryErr.message);
               console.log('\x1b[33m%s\x1b[0m', `⚠️  [FIREWALL FAILSAFE] Bypassing network block. Providing Sandbox OTP: ${code}`);
-              
+
               // Graceful degradation: Inform frontend of local recovery so login flow never crashes
               res.statusCode = 200;
               res.setHeader('Content-Type', 'application/json');
-              res.end(JSON.stringify({ 
-                success: true, 
-                offlineRecovery: true, 
+              res.end(JSON.stringify({
+                success: true,
+                offlineRecovery: true,
                 details: deliveryErr.message,
-                code: code 
+                code: code
               }));
             }
           } else {
@@ -843,7 +857,20 @@ setInterval(async () => {
       };
 
       try {
-        await transporter.sendMail(mailOptions);
+        if (GOOGLE_APPS_SCRIPT_URL) {
+          console.log('[REMINDER ENGINE] 🚀 Using Google Apps Script HTTP Bypass...');
+          const gasRes = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+              to: r.email,
+              subject: mailOptions.subject,
+              html: emailHtml
+            })
+          });
+          if (!gasRes.ok) throw new Error('Apps Script rejected request');
+        } else {
+          await transporter.sendMail(mailOptions);
+        }
         console.log(`[REMINDER ENGINE] ✅ Success: Delivered scheduled medicine notification to ${r.email}`);
       } catch (err) {
         console.error(`[REMINDER ENGINE] ❌ Delivery failed to ${r.email}:`, err.message);
