@@ -947,7 +947,7 @@ DISCLAIMER: This clinical report is parsed using LifeMatrix AI secure data inges
               {/* HIGH-TECH DASHBOARD PORTRAIT IDENTIFIER */}
               <div className="relative flex-shrink-0">
                 <div 
-                  onClick={() => navigate('/profile')}
+                  onClick={() => navigate('/app/profile')}
                   className="w-14 h-14 md:w-20 md:h-20 rounded-2xl md:rounded-[28px] border flex items-center justify-center overflow-hidden shadow-inner cursor-pointer active:scale-95 transition-all duration-300 bg-indigo-950/40 border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.25)] group"
                 >
                   {profilePic ? (
