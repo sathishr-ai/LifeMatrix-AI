@@ -773,8 +773,49 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, '0.0.0.0', () => {
+async function rebuildRemindersFromSupabase() {
+  if (!isSupabaseConfigured) return;
+  try {
+    console.log('[REMINDER ENGINE] Rebuilding scheduled alarms from Supabase cloud...');
+    const supRes = await fetch(`${SUPABASE_URL}/rest/v1/userdata?key=eq.addedMedications`, {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+      }
+    });
+    if (supRes.ok) {
+      const rows = await supRes.json();
+      let allReminders = [];
+      rows.forEach(row => {
+        try {
+           const meds = JSON.parse(row.value);
+           if (Array.isArray(meds)) {
+              meds.forEach(med => {
+                allReminders.push({
+                   email: row.email,
+                   userName: 'User', 
+                   name: med.name,
+                   dosage: med.dosage,
+                   time: med.time,
+                   frequency: med.frequency,
+                   withFood: med.withFood,
+                   created_at: new Date().toISOString()
+                });
+              });
+           }
+        } catch(e) {}
+      });
+      writeReminders(allReminders);
+      console.log(`[REMINDER ENGINE] ✅ Successfully rebuilt ${allReminders.length} alarms from Cloud Storage.`);
+    }
+  } catch(e) {
+    console.error('[REMINDER ENGINE] Failed to rebuild reminders:', e.message);
+  }
+}
+
+server.listen(PORT, '0.0.0.0', async () => {
   console.log(`[BACKEND SYNC] Server running on http://0.0.0.0:${PORT}`);
+  await rebuildRemindersFromSupabase();
 });
 
 function formatTo12Hour(timeStr) {
