@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { Mail, Lock, Eye, EyeOff, AlertCircle, Activity, Dna, ArrowLeft, CheckCircle2, KeyRound, Send, Loader2, User } from 'lucide-react';
 import { toast } from 'sonner';
 import favicon from '../../../assets/favicon.png';
+import authBg from '../../../assets/auth-bg.png';
 
 export function LoginScreen() {
   const navigate = useNavigate();
@@ -125,23 +126,32 @@ export function LoginScreen() {
   };
 
   return (
-    <div className="size-full relative flex items-center justify-center px-6 overflow-hidden bg-gradient-to-br from-[#0B1528] via-[#0A1F44] to-[#008E77]">
-      {/* Isolated Performance-Tuned Background Noise Overlay */}
-      <div className="absolute inset-0 bg-noise opacity-40 pointer-events-none"></div>
-      {/* Holographic Background Orbs & Ambient Particles */}
+    <div className="size-full relative flex items-center justify-center px-6 overflow-hidden bg-[#050B14]">
+      {/* Full-Bleed Background Image */}
+      <div className="absolute inset-0">
+        <img src={authBg} alt="" className="w-full h-full object-cover opacity-70" />
+      </div>
+
+      {/* Very subtle noise for texture */}
+      <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none"></div>
+
+      {/* Holographic Ambient Orbs */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-secondary/15 blur-[120px] opacity-70"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-white/5 blur-[150px] opacity-50"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-secondary/10 blur-[140px] opacity-60"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-cyan-400/5 blur-[150px] opacity-50"></div>
 
         {/* Floating DNA / Medical Particles */}
-        <Dna className="absolute top-[15%] left-[20%] w-12 h-12 text-white/5 animate-float-slow will-change-transform" strokeWidth={1} />
-        <Activity className="absolute bottom-[20%] right-[15%] w-16 h-16 text-secondary/15 animate-float-slower will-change-transform" strokeWidth={1} />
-        <Dna className="absolute top-[40%] right-[10%] w-10 h-10 text-white/5 animate-float-slow animate-delay-300 will-change-transform" strokeWidth={1} />
+        <Dna className="absolute top-[15%] left-[20%] w-12 h-12 text-white/[0.03] animate-float-slow will-change-transform" strokeWidth={1} />
+        <Activity className="absolute bottom-[20%] right-[15%] w-16 h-16 text-secondary/10 animate-float-slower will-change-transform" strokeWidth={1} />
+        <Dna className="absolute top-[40%] right-[10%] w-10 h-10 text-white/[0.03] animate-float-slow animate-delay-300 will-change-transform" strokeWidth={1} />
       </div>
 
       <div className="w-full max-w-md relative z-10">
-        <div className="bg-[#132D57]/70 backdrop-blur-3xl rounded-[2.5rem] shadow-[0_40px_100px_-10px_rgba(0,0,0,0.85),_0_0_40px_-10px_rgba(0,198,167,0.15)] px-4 py-8 sm:p-10 border border-white/20 animate-fade-in-up animate-delay-100">
-          <div className="text-center mb-8">
+        <div className="relative bg-[#0B1528]/50 backdrop-blur-xl rounded-[2.5rem] shadow-[0_20px_60px_-10px_rgba(0,0,0,0.5)] px-4 py-8 sm:p-10 border border-white/15 animate-fade-in-up animate-delay-100">
+          {/* Subtle inner glow */}
+          <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none" />
+
+          <div className="relative text-center mb-8">
             <div className="relative mb-6 inline-flex items-center justify-center group">
               <div className="absolute inset-0 bg-secondary/20 rounded-full blur-2xl scale-150 opacity-40 group-hover:opacity-60 transition-opacity duration-500"></div>
               <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#0B1528] border border-white/10 shadow-2xl flex items-center justify-center overflow-hidden">
