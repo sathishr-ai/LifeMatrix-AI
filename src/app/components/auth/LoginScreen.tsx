@@ -129,7 +129,7 @@ export function LoginScreen() {
     <div className="size-full relative flex items-center justify-center px-6 overflow-hidden bg-[#050B14]">
       {/* Full-Bleed Background Image */}
       <div className="absolute inset-0">
-        <img src={authBg} alt="" className="w-full h-full object-cover opacity-70" />
+        <img src={authBg} alt="" className="w-full h-full object-cover opacity-60" />
       </div>
 
       {/* Very subtle noise for texture */}

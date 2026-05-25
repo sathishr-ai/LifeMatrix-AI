@@ -124,7 +124,7 @@ export function SignupScreen() {
     <div className="relative min-h-full w-full flex items-center justify-center px-6 py-10 overflow-auto bg-[#050B14]">
       {/* Full-Bleed Background Image — fixed to viewport */}
       <div className="fixed inset-0 z-0">
-        <img src={authBg} alt="" className="w-full h-full object-cover opacity-70" />
+        <img src={authBg} alt="" className="w-full h-full object-cover opacity-60" />
       </div>
 
       {/* Very subtle noise for texture */}
