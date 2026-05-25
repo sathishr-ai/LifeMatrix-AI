@@ -142,9 +142,9 @@ export function SignupScreen() {
       </div>
 
       <div className="w-full max-w-md relative z-10">
-        <div className="relative bg-[#0B1528]/50 backdrop-blur-xl rounded-[2.5rem] shadow-[0_20px_60px_-10px_rgba(0,0,0,0.5)] px-4 py-8 sm:p-10 border border-white/15 animate-fade-in-up animate-delay-100">
+        <div className="relative bg-[#0B1528]/30 backdrop-blur-md rounded-[2.5rem] shadow-[0_20px_60px_-10px_rgba(0,0,0,0.4)] px-4 py-8 sm:p-10 border border-white/10 animate-fade-in-up animate-delay-100">
           {/* Subtle inner glow */}
-          <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-b from-white/[0.04] to-transparent pointer-events-none" />
+          <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
 
           <div className="relative text-center mb-6">
             <div className="relative mb-6 inline-flex items-center justify-center group">
