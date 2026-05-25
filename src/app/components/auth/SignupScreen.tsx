@@ -121,17 +121,17 @@ export function SignupScreen() {
   };
 
   return (
-    <div className="size-full relative flex items-center justify-center px-6 py-8 overflow-auto bg-[#050B14]">
-      {/* Full-Bleed Background Image */}
-      <div className="absolute inset-0">
+    <div className="relative min-h-full w-full flex items-center justify-center px-6 py-10 overflow-auto bg-[#050B14]">
+      {/* Full-Bleed Background Image — fixed to viewport */}
+      <div className="fixed inset-0 z-0">
         <img src={authBg} alt="" className="w-full h-full object-cover opacity-70" />
       </div>
 
       {/* Very subtle noise for texture */}
-      <div className="absolute inset-0 bg-noise opacity-10 pointer-events-none"></div>
+      <div className="fixed inset-0 bg-noise opacity-10 pointer-events-none z-0"></div>
 
       {/* Holographic Ambient Orbs */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+      <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-secondary/10 blur-[140px] opacity-60"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-cyan-400/5 blur-[150px] opacity-50"></div>
 
