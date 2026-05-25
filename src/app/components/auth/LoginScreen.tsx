@@ -146,8 +146,8 @@ export function LoginScreen() {
         <Dna className="absolute top-[40%] right-[10%] w-10 h-10 text-white/[0.03] animate-float-slow animate-delay-300 will-change-transform" strokeWidth={1} />
       </div>
 
-      <div className="w-full max-w-md relative z-10">
-        <div className="relative bg-[#0B1528]/30 backdrop-blur-md rounded-[2.5rem] shadow-[0_20px_60px_-10px_rgba(0,0,0,0.4)] px-4 py-8 sm:p-10 border border-white/10 animate-fade-in-up animate-delay-100">
+      <div className="w-full max-w-[26rem] relative z-10">
+        <div className="relative bg-[#0B1528]/30 backdrop-blur-md rounded-[2rem] shadow-[0_20px_60px_-10px_rgba(0,0,0,0.4)] px-4 py-7 sm:px-9 sm:py-9 border border-white/10 animate-fade-in-up animate-delay-100">
           {/* Subtle inner glow */}
           <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-b from-white/[0.03] to-transparent pointer-events-none" />
 
