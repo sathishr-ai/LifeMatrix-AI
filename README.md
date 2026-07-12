@@ -11,13 +11,11 @@
   [![Selenium](https://img.shields.io/badge/Selenium-Testing-43B02A?style=for-the-badge&logo=selenium&logoColor=white)](#)
   [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](#)
 
-  <br>
+  <br><br>
 
-  <h3>
-    <a href="https://life-matrix-ai.vercel.app/">🌐 Live Web App</a>
-    &nbsp;•&nbsp;
-    <a href="./LifeMatrix-AI.apk">🤖 Download Android APK</a>
-  </h3>
+  [![Live Web App](https://img.shields.io/badge/🌐_Live_Web_App-Play_Online-00C6A7?style=for-the-badge)](https://life-matrix-ai.vercel.app/)
+  &nbsp;&nbsp;
+  [![Download Android APK](https://img.shields.io/badge/🤖_Download_Android_APK-Direct_Download-0072F5?style=for-the-badge)](https://github.com/sathishr-ai/LifeMatrix-AI/raw/main/LifeMatrix-AI.apk)
 
 </div>
 
