@@ -311,15 +311,7 @@ The test runner launches a Chrome instance, performs UI validation checks, and s
 
 ---
 
-## 📊 9. SPSS Statistical Analysis
-The project includes a clinical validation dataset, which is documented in `spss_results.html`. This report details the statistical efficacy of the LifeMatrix tracking twin model across multiple user groups, using:
-- **Descriptive Statistics:** Baseline demographics and biometric variance.
-- **T-Test Comparisons:** Pre- vs. post-monitoring recovery timelines.
-- **Correlation Matrices:** Relationships between active habit scores and biological stability values.
-
----
-
-## 📜 10. Attributions & Licenses
+## 📜 9. Attributions & Licenses
 *   **UI Components:** Styled using Tailwind CSS v4 and built on [shadcn/ui](https://ui.shadcn.com/) templates.
 *   **Media Assets:** Graphic elements, illustration styles, and placeholder portraits sourced from [Unsplash](https://unsplash.com/).
 *   **License:** Distributed under the MIT License.
