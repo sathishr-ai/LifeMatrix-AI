@@ -2,7 +2,7 @@
 
 <div align="center">
 
-  <img src="./lifematrix_banner_v2.png" width="100%" alt="LifeMatrix AI Banner">
+  <img src="./lifematrix_banner_v3.png" width="100%" alt="LifeMatrix AI Banner">
 
   <br>
 
