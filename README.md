@@ -2,23 +2,24 @@
 
 <div align="center">
 
-  <img src="./lifematrix_banner.png" width="100%" alt="LifeMatrix AI Banner">
+  <img src="./lifematrix_banner_v2.png" width="100%" alt="LifeMatrix AI Banner">
 
   <br>
-  [![Vite](https://img.shields.io/badge/Vite-6.3.5-646CFF?style=for-the-badge&logo=vite&logoColor=white)](#)
-  [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=black)](#)
-  [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](#)
-  [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](#)
-  [![Expo](https://img.shields.io/badge/Expo-Mobile-000020?style=for-the-badge&logo=expo&logoColor=white)](#)
-  [![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](#)
-  [![Selenium](https://img.shields.io/badge/Selenium-Testing-43B02A?style=for-the-badge&logo=selenium&logoColor=white)](#)
-  [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](#)
+
+  <a href="#"><img src="https://img.shields.io/badge/Vite-6.3.5-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite"></a>
+  <a href="#"><img src="https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React"></a>
+  <a href="#"><img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="TailwindCSS"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Expo-Mobile-000020?style=for-the-badge&logo=expo&logoColor=white" alt="Expo"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Supabase-Database-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase"></a>
+  <a href="#"><img src="https://img.shields.io/badge/Selenium-Testing-43B02A?style=for-the-badge&logo=selenium&logoColor=white" alt="Selenium"></a>
+  <a href="#"><img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License"></a>
 
   <br><br>
 
-  [![Live Web App](https://img.shields.io/badge/🌐_Live_Web_App-Play_Online-00C6A7?style=for-the-badge)](https://life-matrix-ai.vercel.app/)
+  <a href="https://life-matrix-ai.vercel.app/"><img src="https://img.shields.io/badge/🌐_Live_Web_App-Play_Online-00C6A7?style=for-the-badge" alt="Live Web App"></a>
   &nbsp;&nbsp;
-  [![Download Android APK](https://img.shields.io/badge/🤖_Download_Android_APK-Direct_Download-0072F5?style=for-the-badge)](https://github.com/sathishr-ai/LifeMatrix-AI/raw/main/LifeMatrix-AI.apk)
+  <a href="https://github.com/sathishr-ai/LifeMatrix-AI/raw/main/LifeMatrix-AI.apk"><img src="https://img.shields.io/badge/🤖_Download_Android_APK-Direct_Download-0072F5?style=for-the-badge" alt="Download Android APK"></a>
 
 </div>
 
