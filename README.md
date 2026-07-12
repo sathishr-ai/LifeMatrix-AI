@@ -1,7 +1,10 @@
 # 🧬 LifeMatrix AI — Enterprise-Grade Digital Healthcare Ecosystem
 
 <div align="center">
-  
+
+  <img src="./lifematrix_banner.png" width="100%" alt="LifeMatrix AI Banner">
+
+  <br>
   [![Vite](https://img.shields.io/badge/Vite-6.3.5-646CFF?style=for-the-badge&logo=vite&logoColor=white)](#)
   [![React](https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=black)](#)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](#)
