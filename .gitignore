@@ -39,3 +39,7 @@ scratch/
 
 # Misc
 *.tsbuildinfo
+
+# Local Databases
+db.json
+reminders.json
