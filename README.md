@@ -1,4 +1,4 @@
-# 🧬 LifeMatrix AI — Enterprise-Grade Digital Healthcare Ecosystem
+<h1 align="center">🧬 LifeMatrix AI — Enterprise-Grade Digital Healthcare Ecosystem</h1>
 
 <div align="center">
 
