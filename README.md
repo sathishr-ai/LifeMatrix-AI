@@ -16,6 +16,7 @@
 ---
 
 ## 🌌 1. Project Vision & Aesthetics
+
 **LifeMatrix AI** is an advanced, premium-tier digital healthcare application that provides a unified, cross-platform health tracking, diagnostic, and risk analytics experience. Built on a zero-trust model design, the application provides medical dashboard tracking, smart medication scheduling, AI-powered symptom analysis, and local-to-cloud data synchronization.
 
 ### 🎨 The "Cyber-Cyan" Visual Identity
@@ -94,22 +95,20 @@ Provides an interactive symptom assessment workflow:
 
 ---
 
-## 💻 4. Comprehensive REST API Specifications
+## 💻 4. REST API Endpoint Layout
 
 The Node.js server (`server.js`) handles all user operations and data synchronization.
 
-| HTTP Method | Route Endpoint | Payload Parameters | Description | Response Code |
-| :--- | :--- | :--- | :--- | :--- |
-| **GET** | `/api/users` | None | Returns list of all registered users (Cloud/Fallback). | `200 OK` |
-| **POST** | `/api/users` | `{ users: [ { name, email, password } ] }` | Bulk syncs or signs up new users into system databases. | `200 OK` / `400 Bad Request` |
-| **GET** | `/api/userdata` | Query: `?email=user@domain.com` | Fetches active health profiles, medical history, and twins. | `200 OK` / `400 Bad Request` |
-| **POST** | `/api/userdata` | `{ email, key, value }` | Updates specific metrics. Automatically uploads Base64 images to Supabase storage. | `200 OK` / `400 Bad Request` |
-| **POST** | `/api/userdata/remove` | `{ email, key }` | Removes target attributes. Wipes uploaded files from Supabase bucket storage. | `200 OK` / `400 Bad Request` |
-| **POST** | `/api/users/delete` | `{ email }` | Triggers a cascading wipe of all data tables. | `200 OK` / `400 Bad Request` |
-| **GET** | `/api/reminders` | None | Fetches all active medication reminder alarms. | `200 OK` |
-| **POST** | `/api/reminders` | `{ email, userName, name, dosage, time, frequency, withFood }` | Configures and schedules a new medication alarm. | `200 OK` / `400 Bad Request` |
-| **DELETE** | `/api/reminders` | `{ email, name }` | Deletes a scheduled medication alarm. | `200 OK` / `400 Bad Request` |
-| **POST** | `/api/auth/send-recovery-email` | `{ email, code }` | Sends password recovery verification codes. | `200 OK` / `400 Bad Request` |
+*   `GET /api/users` — Returns list of all registered users (Cloud/Fallback).
+*   `POST /api/users` — Bulk syncs or signs up new users into system databases.
+*   `GET /api/userdata` — Fetches active health profiles, medical history, and twins.
+*   `POST /api/userdata` — Updates specific metrics. Automatically uploads Base64 images to Supabase storage.
+*   `POST /api/userdata/remove` — Removes target attributes. Wipes uploaded files from Supabase bucket storage.
+*   `POST /api/users/delete` — Triggers a cascading wipe of all data tables.
+*   `GET /api/reminders` — Fetches all active medication reminder alarms.
+*   `POST /api/reminders` — Configures and schedules a new medication alarm.
+*   `DELETE /api/reminders` — Deletes a scheduled medication alarm.
+*   `POST /api/auth/send-recovery-email` — Sends password recovery verification codes.
 
 ---
 
@@ -117,142 +116,38 @@ The Node.js server (`server.js`) handles all user operations and data synchroniz
 
 ### Supabase Cloud Structure
 When Supabase keys are configured, the API connects to two target tables inside your cloud PostgreSQL instance:
-
-```sql
--- 1. Users Security Table
-CREATE TABLE public.users (
-    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    mobile VARCHAR(50),
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
-);
-
--- 2. User Data Profiles Table (Key-Value Setup)
-CREATE TABLE public.userdata (
-    id BIGSERIAL PRIMARY KEY,
-    email VARCHAR(255) REFERENCES public.users(email) ON DELETE CASCADE,
-    key VARCHAR(255) NOT NULL,
-    value TEXT NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    UNIQUE (email, key)
-);
-```
+*   **Users Security Table (`users`):** Stores essential authentication records such as names, unique email keys, salted passwords, and registration timestamps.
+*   **User Data Profiles Table (`userdata`):** Implements a highly scalable key-value metadata store linked back to users via cascading foreign key constraints.
 
 ### Local JSON Failsafe File (`db.json`)
-If Supabase is offline or unconfigured, the application falls back to local disk storage:
-```json
-{
-  "users": [
-    {
-      "name": "Alex Johnson",
-      "email": "test@example.com",
-      "password": "password123"
-    }
-  ],
-  "userdata": {
-    "test@example.com": {
-      "user_age": "32",
-      "systolic_pressure": "120",
-      "diastolic_pressure": "80",
-      "daily_water_liters": "2.5"
-    }
-  }
-}
-```
+If Supabase is offline or unconfigured, the application falls back to local disk storage. This file structures credentials and profiles under distinct keys matching user accounts.
 
 ---
 
 ## 📱 6. React Native WebView Integration Bridge
-The mobile application in the `/expo-app` directory serves as an optimized native wrapper for the web frontend using **Expo WebView**:
-
-```javascript
-// Native bridge configuration in expo-app/App.js
-import React from 'react';
-import { WebView } from 'react-native-webview';
-import { SafeAreaView, StatusBar } from 'react-native';
-
-export default function App() {
-  const webAppUrl = 'https://life-matrix-ai.vercel.app/';
-
-  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#0B1528' }}>
-      <StatusBar barStyle="light-content" backgroundColor="#0B1528" />
-      <WebView 
-        source={{ uri: webAppUrl }}
-        javaScriptEnabled={true}
-        domStorageEnabled={true}
-        startInLoadingState={true}
-        allowsBackForwardNavigationGestures={true}
-        mixedContentMode="always"
-      />
-    </SafeAreaView>
-  );
-}
-```
+The mobile application in the `/expo-app` directory serves as an optimized native wrapper for the web frontend. It uses **Expo WebView** to render the web client on target devices, enabling features like Javascript support, DOM storage caching, back-and-forth gestures, and native system bar styling matching the premium palette.
 
 ---
 
 ## 🔒 7. Vulnerability Audit & Remediation Guide
 
-The security code review (`Vulnerability Test Results/Executive_Summary.md`) identified several issues. Below is a remediation plan to secure your deployment:
+The security code review identified several issues. Below is a remediation plan to secure your deployment:
 
 ### 🚨 Critical Vulnerability 1: Plaintext Credentials Exposed
 *   **Risk:** Supplying raw Supabase keys, Gmail accounts, and Google App passwords in the repository.
-*   **Remediation:** Remove hardcoded constants and fetch credentials from environment variables:
-    ```javascript
-    // Replace hardcoded strings in server.js:
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
-    const GMAIL_USER = process.env.GMAIL_USER;
-    const GMAIL_APP_PASSWORD = process.env.GMAIL_APP_PASSWORD;
-    ```
+*   **Remediation:** Remove hardcoded constants from code and load them from environment variables via a configuration runner.
 
 ### 🚨 Critical Vulnerability 2: Plaintext Password Storage
 *   **Risk:** Storing user credentials as plaintext on disk or in the cloud.
-*   **Remediation:** Use `bcrypt` or `argon2` to hash passwords during signup and verify them during login.
-    ```javascript
-    import bcrypt from 'bcrypt';
-    const saltRounds = 12;
-
-    // During Signup/Sync:
-    const hashedPassword = await bcrypt.hash(rawPassword, saltRounds);
-
-    // During Authentication:
-    const match = await bcrypt.compare(providedPassword, hashedPassword);
-    ```
+*   **Remediation:** Use password hashing libraries to salt and hash passwords during signup and verify them during login.
 
 ### 🚨 High Vulnerability 3: Broken Access Control (IDOR)
-*   **Risk:** Any client can request data for any user by altering the `email` query parameter.
-*   **Remediation:** Implement JWT validation to verify that requests only access their own user data:
-    ```javascript
-    import jwt from 'jsonwebtoken';
-
-    // Verify token middleware:
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) return res.statusCode(403);
-      req.userEmail = user.email; // Safely enforce email scope
-    });
-    ```
+*   **Risk:** Any client can request data for any user by altering the query parameters.
+*   **Remediation:** Implement secure session validation or token headers on all backend requests to restrict data access to authenticated users only.
 
 ### 🚨 High Vulnerability 4: Denial of Service via Large Payloads
 *   **Risk:** The server reads incoming stream chunks indefinitely, allowing memory exhaust attacks.
-*   **Remediation:** Enforce a maximum payload limit (e.g., `2MB`) and abort excessive uploads:
-    ```javascript
-    let body = '';
-    req.on('data', chunk => {
-      body += chunk;
-      if (body.length > 2 * 1024 * 1024) { // 2MB limit
-        res.statusCode = 413;
-        res.end('Payload Too Large');
-        req.destroy();
-      }
-    });
-    ```
+*   **Remediation:** Enforce a maximum payload limit (e.g., `2MB`) on incoming requests and terminate connections that exceed this threshold.
 
 ---
 
@@ -271,14 +166,14 @@ npm install
 ```
 
 ### 🌍 Step 2: Configure Environment Variables
-Create a `.env` file in the root workspace folder:
+Create a `.env` file in the root workspace folder with placeholder variables:
 ```env
 PORT=5175
-SUPABASE_URL=https://gyjnnwnnfdaxapsucoaw.supabase.co
-SUPABASE_ANON_KEY=your_key_here
-GMAIL_USER=sathishat2005@gmail.com
-GMAIL_APP_PASSWORD=rckbiepqqjsspyrg
-GOOGLE_APPS_SCRIPT_URL=https://script.google.com/macros/s/AKfycbxmRhA-Zv6llh9gLWgKkajWSUg1kxIHRxgihb-hBHumBFQguizMz84xf9LP4wXUUsK9jA/exec
+SUPABASE_URL=your_supabase_url_here
+SUPABASE_ANON_KEY=your_supabase_key_here
+GMAIL_USER=your_email_here@gmail.com
+GMAIL_APP_PASSWORD=your_google_app_password_here
+GOOGLE_APPS_SCRIPT_URL=your_google_script_url_here
 ```
 
 ### 💻 Step 3: Run the Development Server
@@ -307,7 +202,7 @@ Verify the installation by running the Selenium E2E test suite:
 ```bash
 node selenium_test.js
 ```
-The test runner launches a Chrome instance, performs UI validation checks, and saves a summary report to `Test_Report.xlsx`.
+The test runner launches a Chrome instance, performs UI validation checks, and saves a summary report.
 
 ---
 
