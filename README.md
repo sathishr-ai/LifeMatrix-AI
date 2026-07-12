@@ -2,10 +2,6 @@
 
 <div align="center">
 
-  <img src="./lifematrix_banner_v3.png" width="100%" alt="LifeMatrix AI Banner">
-
-  <br>
-
   <a href="#"><img src="https://img.shields.io/badge/Vite-6.3.5-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite"></a>
   <a href="#"><img src="https://img.shields.io/badge/React-18.3.1-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React"></a>
   <a href="#"><img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"></a>
