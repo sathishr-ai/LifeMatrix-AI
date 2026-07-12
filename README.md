@@ -10,7 +10,15 @@
   [![Supabase](https://img.shields.io/badge/Supabase-Database-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](#)
   [![Selenium](https://img.shields.io/badge/Selenium-Testing-43B02A?style=for-the-badge&logo=selenium&logoColor=white)](#)
   [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](#)
-  
+
+  <br>
+
+  <h3>
+    <a href="https://life-matrix-ai.vercel.app/">🌐 Live Web App</a>
+    &nbsp;•&nbsp;
+    <a href="./LifeMatrix-AI.apk">🤖 Download Android APK</a>
+  </h3>
+
 </div>
 
 ---
