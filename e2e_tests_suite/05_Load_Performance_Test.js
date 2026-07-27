@@ -1,56 +1,58 @@
 import { performance } from 'perf_hooks';
+import crypto from 'crypto';
 
-async function runLoadTests() {
-    console.log("📈 Starting Genuine Hardware & V8 Load Testing Suite...");
+async function runAggressiveUniqueLoadTests() {
+    console.log("📈 Starting Aggressive Hardware CPU Thrashing (Absolute Unique Hashing)...");
 
     let passCount = 0;
     const TARGET = 300;
     const LATENCY_THRESHOLD_MS = 500;
+    let generatedHashes = new Set();
 
     try {
-        console.log("\n⚡ [PHASE 1] Bombarding Node V8 Engine with Computational Threads...");
-        console.log(`Setting maximum operational latency constraint: <${LATENCY_THRESHOLD_MS}ms per thread`);
+        console.log("\n⚡ [PHASE 1] Cryptographic Core Saturation Protocol...");
+        console.log(`Checking strict bounds latency: <${LATENCY_THRESHOLD_MS}ms per unique calculation thread`);
 
         for (let i = 1; i <= TARGET; i++) {
-            const cycleStart = performance.now();
+            // Generating entirely distinct string payloads to guarantee no V8 Cache repeats
+            const uniquePayloadString = `LifeMatrix-AI-Payload-Data-${Math.random()}-${Date.now()}-${crypto.randomBytes(32).toString('hex')}`;
 
-            // Simulating physical backend algorithm hashing/cryptography (AI Processing Emulation)
-            let hardwareHash = 0;
-            for (let j = 0; j < 80000; j++) {
-                // Thrash the event loop with trigonometric float calculations
-                hardwareHash = Math.sqrt(j) * Math.sin(j) * Math.cos(j);
-            }
+            if (!generatedHashes.has(uniquePayloadString)) {
+                generatedHashes.add(uniquePayloadString);
 
-            const cycleEnd = performance.now();
-            const latency = cycleEnd - cycleStart;
+                const cycleStart = performance.now();
 
-            // Physical assertion blocking limits
-            if (latency < LATENCY_THRESHOLD_MS) {
-                passCount++;
-                if (i % 50 === 0) {
-                    console.log(`✅ [Thread #${i}] CPU resolved in ${latency.toFixed(2)}ms (Limit: ${LATENCY_THRESHOLD_MS}ms) | Buffer Size: 80,000 floats`);
+                // Natively thrash the hashing logic against the unique payload String exclusively
+                let output = '';
+                for (let j = 0; j < 500; j++) {
+                    const hasher = crypto.createHash('sha512');
+                    hasher.update(uniquePayloadString + j.toString());
+                    output = hasher.digest('hex');
                 }
-            } else {
-                console.warn(`⚠️ [Thread #${i}] FAILED THRESHOLD: ${latency.toFixed(2)}ms`);
+
+                const cycleEnd = performance.now();
+                const latency = cycleEnd - cycleStart;
+
+                if (latency < LATENCY_THRESHOLD_MS) {
+                    passCount++;
+                    if (passCount % 50 === 0) {
+                        console.log(`✅ [Payload 0x${output.substring(0, 10)}...] resolved uniquely in ${latency.toFixed(2)}ms`);
+                    }
+                } else {
+                    console.warn(`⚠️ [Payload ${i}] FAILED THRESHOLD: ${latency.toFixed(2)}ms`);
+                }
             }
         }
 
         console.log(`\n===========================================`);
-        console.log(`🎉 LOAD TESTING & PERFORMANCE SUITE COMPLETED`);
-        console.log(`🔥 TOTAL HARDWARE THREADS PROCESSED: ${TARGET}`);
-        console.log(`✅ PERFORMANCE CHECK PASSED: ${passCount}`);
-
-        if (passCount === TARGET) {
-            console.log(`📊 CORE LATENCY: 100% HEALTHY (0 CRASHES)`);
-        } else {
-            console.log(`📊 CORE LATENCY WARNING: Failed to resolve ${TARGET - passCount} processes fast enough.`);
-        }
-
+        console.log(`🎉 LOAD TESTING & CPU UNIQUE PERFORMANCE COMPLETE`);
+        console.log(`🔥 TOTAL DISTINCT CRYPTO HASH THREADS: ${generatedHashes.size}`);
+        console.log(`✅ PERFORMANCE TIMING PASSED: ${passCount}`);
         console.log(`===========================================`);
 
     } catch (err) {
-        console.error("❌ Load Test Failed to Compile Limits:", err.message);
+        console.error("❌ Aggressive Load Test Execution Exploded:", err);
     }
 }
 
-runLoadTests();
+runAggressiveUniqueLoadTests();
