@@ -46,16 +46,6 @@ jobs:
                   sleep 5
                   echo "All 300 Validation Tests Passed"
 
-    deployment_status:
-        name: 🚀 Deployment Status (300)
-        runs-on: ubuntu-latest
-        steps:
-            - name: Verify 300 Deployment Signals
-              run: |
-                  for i in {1..300}; do echo "ok $i - Deployment Check $i passed"; done
-                  sleep 5
-                  echo "Deployment 100% stable."
-
     load_testing:
         name: 📈 Load Testing — Performance (300)
         runs-on: ubuntu-latest
@@ -65,23 +55,3 @@ jobs:
                   for i in {1..300}; do echo "ok $i - Load Test $i passed"; done
                   sleep 15
                   echo "All 300 Load Tracking Tests Passed"
-
-    compile_report:
-        name: 📊 Compile Master Report & Deploy
-        needs:
-            [
-                selenium_tests,
-                appium_tests,
-                unit_tests,
-                validation_tests,
-                deployment_status,
-                load_testing,
-            ]
-        runs-on: ubuntu-latest
-        steps:
-            - name: Compile and Deploy Master Report
-              run: |
-                  echo "Compiling E2E Excel Report..."
-                  echo "Deploying to production..."
-                  sleep 5
-                  echo "Deployment successful."
