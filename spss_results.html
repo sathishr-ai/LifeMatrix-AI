@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeMatrix AI - SPSS Results</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: #ffdceb; /* Light pink background matching the image */
+            margin: 0;
+            padding: 40px;
+            color: #000;
+        }
+
+        .header-box {
+            background-color: #ffeb3b; /* Yellow box */
+            border: 2px solid #000;
+            padding: 8px 20px;
+            font-size: 24px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 40px;
+            box-shadow: 1px 1px 0px #000;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+        }
+
+        /* Chart Styles */
+        .chart-container {
+            flex: 0 0 500px;
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .chart-title {
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .chart-area {
+            position: relative;
+            height: 300px;
+            border-left: 2px solid #000;
+            border-bottom: 2px solid #000;
+            margin-left: 50px;
+            margin-bottom: 40px;
+        }
+
+        /* Y-Axis lines and labels */
+        .y-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            border-top: 1px solid #e0e0e0;
+            z-index: 1;
+        }
+        .y-label {
+            position: absolute;
+            left: -40px;
+            font-size: 11px;
+            transform: translateY(-50%);
+        }
+        .y-title {
+            position: absolute;
+            left: -70px;
+            top: 50%;
+            transform: rotate(-90deg) translateX(50%);
+            font-size: 13px;
+            font-weight: bold;
+            transform-origin: left center;
+            white-space: nowrap;
+        }
+
+        /* X-Axis labels */
+        .x-labels {
+            display: flex;
+            justify-content: space-around;
+            padding-top: 10px;
+            font-size: 12px;
+        }
+        .x-title {
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .chart-footer {
+            text-align: center;
+            font-size: 10px;
+            margin-top: 5px;
+            color: #555;
+        }
+
+        /* Bars */
+        .bars {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 100%;
+            position: relative;
+            z-index: 2;
+            padding: 0 20px;
+        }
+        .bar {
+            width: 140px;
+            background-color: #2db3ff; /* Bright blue */
+            border: 1px solid #000;
+            position: relative;
+        }
+        /* Error bars */
+        .error-bar {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            width: 2px;
+            height: 20px;
+            background-color: #000;
+            transform: translateX(-50%);
+        }
+        .error-cap-top {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            width: 15px;
+            height: 2px;
+            background-color: #000;
+            transform: translateX(-50%);
+        }
+        .error-cap-bottom {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            width: 15px;
+            height: 2px;
+            background-color: #000;
+            transform: translateX(-50%);
+        }
+
+        .fig-caption {
+            font-weight: bold;
+            font-size: 18px;
+            text-align: center;
+            margin-top: 20px;
+            max-width: 500px;
+            line-height: 1.3;
+        }
+
+        /* Bullet Points Styles */
+        .text-content {
+            flex: 1;
+            font-size: 18px;
+            line-height: 1.8;
+            padding-top: 10px;
+        }
+
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+            margin: 0;
+        }
+
+        li {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header-box">RESULTS</div>
+
+    <div class="content-wrapper">
+        
+        <!-- Left Side: Chart -->
+        <div>
+            <div class="chart-container">
+                <div class="chart-title">Mean of Score by Platform</div>
+                
+                <div class="chart-area">
+                    <div class="y-title">Mean Score</div>
+                    
+                    <!-- Grid Lines and Y Labels -->
+                    <div class="y-line" style="top: 0%;"><span class="y-label">100.00</span></div>
+                    <div class="y-line" style="top: 20%;"><span class="y-label">80.00</span></div>
+                    <div class="y-line" style="top: 40%;"><span class="y-label">60.00</span></div>
+                    <div class="y-line" style="top: 60%;"><span class="y-label">40.00</span></div>
+                    <div class="y-line" style="top: 80%;"><span class="y-label">20.00</span></div>
+                    <div class="y-line" style="top: 100%; border-top: none;"><span class="y-label">0.00</span></div>
+                    
+                    <!-- Bars -->
+                    <div class="bars">
+                        <!-- LifeMatrix AI Bar (96.5%) -->
+                        <div class="bar" style="height: 96.5%;">
+                            <div class="error-bar"></div>
+                            <div class="error-cap-top"></div>
+                            <div class="error-cap-bottom"></div>
+                        </div>
+                        <!-- Traditional Web Bar (78.2%) -->
+                        <div class="bar" style="height: 78.2%;">
+                            <div class="error-bar"></div>
+                            <div class="error-cap-top"></div>
+                            <div class="error-cap-bottom"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="x-labels">
+                    <span style="padding-left: 20px;">LifeMatrix AI App</span>
+                    <span style="padding-right: 20px;">Traditional Web</span>
+                </div>
+                <div class="x-title">Platform</div>
+                <div class="chart-footer">Error Bars: 95% CI</div>
+            </div>
+
+            <div class="fig-caption">
+                Fig. 2. Mean diagnostic accuracy comparison between LifeMatrix AI and Traditional Web platforms.
+            </div>
+        </div>
+
+        <!-- Right Side: Text -->
+        <div class="text-content">
+            <ul>
+                <li>LifeMatrix AI achieved significantly higher diagnostic accuracy and response time scores (96.50/100) compared to the Traditional Web (78.20/100).</li>
+                <li>IBM SPSS T-Test analysis showed a p-value of &lt; 0.001 (p &lt; 0.05). LifeMatrix AI demonstrated superior health assessment efficiency, requiring only 8.4s per diagnostic session (via automated wearable telemetry) compared to the Web's 24.5s manual processing requirement.</li>
+                <li>LifeMatrix AI scored significantly higher in both system usability (SUS: 95.5 compared to 82.0) and overall patient satisfaction ratings (4.9/5 against 4.1/5).</li>
+                <li>LifeMatrix AI reduced clinical input errors to just 0.3 per session (due to automated BLE sync) compared to 3.1 on the manual Web platform.</li>
+            </ul>
+        </div>
+
+    </div>
+
+</body>
+</html>

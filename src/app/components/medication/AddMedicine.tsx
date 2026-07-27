@@ -5,6 +5,12 @@ import { toast } from 'sonner';
 import Tesseract from 'tesseract.js';
 import { getStorageItem, setStorageItem } from '../../utils/storage';
 
+declare global {
+  interface Window {
+    ReactNativeWebView?: any;
+  }
+}
+
 export function AddMedicine() {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);

@@ -4,6 +4,12 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { getStorageItem, setStorageItem } from '../../utils/storage';
 
+declare global {
+  interface Window {
+    ReactNativeWebView?: any;
+  }
+}
+
 interface SavedSymptomLog {
   id: string;
   date: string;
@@ -565,7 +571,7 @@ export function ResultScreen() {
     color: string; 
     description: string; 
     recommendations: string[]; 
-    medications: { name: string; dosage: string; type: 'OTC' | 'Prescription' | 'Emergency' | 'Supplement'; purpose: string }[];
+    medications: { name: string; dosage: string; type: string; purpose: string }[];
     dietChart: {
       morning: string;
       breakfast: string;

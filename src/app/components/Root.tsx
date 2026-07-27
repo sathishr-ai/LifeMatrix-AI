@@ -30,7 +30,7 @@ export function Root() {
     // --- Enterprise Security: Auto-Logout Inactivity Timer ---
     // HIPAA standard: Log out user after 15 minutes of zero interaction
     const INACTIVITY_TIMEOUT_MS = 15 * 60 * 1000; 
-    let inactivityTimer: NodeJS.Timeout;
+    let inactivityTimer: ReturnType<typeof setTimeout>;
 
     const resetInactivityTimeout = () => {
       clearTimeout(inactivityTimer);
