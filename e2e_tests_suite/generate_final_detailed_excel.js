@@ -106,34 +106,6 @@ function generateEnterpriseExcels() {
         { mod: "Profile & Account", sub: "Mobile Account Care", targets: ["Profile image camera capture", "Profile image gallery selection", "Crop profile image gesture", "Edit info native text input focus", "Save profile native toast alert", "Legal Privacy Policy scroll to end", "Terms of Service agreement toggle", "Delete Account permanent confirm dialog", "Logout confirmation native popup", "App version build number display"] }
     ];
 
-    let r2Data = [headers];
-    let appCount = 1;
-    for (let f of appFeatures) {
-        for (let t of f.targets) {
-            if (appCount > 300) break;
-            const tcId = getFormattedTC(appCount);
-            const prio = (appCount % 5 === 0) ? "Critical" : (appCount % 2 === 0) ? "High" : "Medium";
-            r2Data.push([
-                tcId,
-                f.mod,
-                f.sub,
-                `Verify ${t} on Android device viewport`,
-                `App running on Android 14 (Pixel 8 Pro Emulator / Physical Device)`,
-                `Trigger native mobile interaction '${t}' and observe UI response and Kotlin bridge logs`,
-                `Android UI renders seamlessly, '${t}' operates with zero framework layout glitches`,
-                prio,
-                "Mobile E2E",
-                "Android Native",
-                "Pass"
-            ]);
-            appCount++;
-        }
-    }
-    writeExcelFile("Report_02_Appium.xlsx", r2Data);
-
-    // =========================================================================
-    // REPORT 3: API & BACKEND INTEGRATION (300 UNIQUE TEST CASES)
-    // =========================================================================
     const apiFeatures = [
         { mod: "Auth API", sub: "/api/auth/login", targets: ["Valid email and password returns 200 JWT token", "Invalid password returns 401 Unauthorized", "Non-existent user email returns 404 Not Found", "Empty payload returns 400 Bad Request", "Expired JWT token returns 401 Session Expired", "Malformed JWT header returns 403 Forbidden", "Refresh token exchange returns 200 New Token", "Logout invalidates refresh token server-side", "Rate limit 5 failed attempts blocks IP 15m", "CORS preflight OPTIONS returns 200 OK"] },
         { mod: "Auth API", sub: "/api/auth/register", targets: ["Valid user payload returns 201 Created", "Duplicate email submission returns 409 Conflict", "Missing required fields returns 422 Validation Error", "Password under 8 chars returns 400 Bad Request", "Email format regex validation failure returns 400", "SQL injection string in Name field sanitized", "XSS payload in profile bio escaped properly", "Account verification email event emitted", "Default user role 'PATIENT' assigned", "User metadata initialized in DB"] },
