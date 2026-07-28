@@ -1,4 +1,4 @@
-name: LifeMatrix AI — Enterprise QA Automation Pipeline
+name: LifeMatrix AI E2E Tests
 
 on:
     push:
@@ -13,9 +13,9 @@ jobs:
         name: "🌐 Selenium — Website Tests (300)"
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v5
+            - uses: actions/checkout@v4
             - name: Upload Enterprise Testing Reports (Excel)
-              uses: actions/upload-artifact@v5
+              uses: actions/upload-artifact@v4
               with:
                   name: LifeMatrix_Enterprise_Testing_Reports
                   path: e2e_tests_suite/Report_*.xlsx
