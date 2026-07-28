@@ -23,12 +23,7 @@ jobs:
               uses: actions/upload-artifact@v4
               with:
                   name: LifeMatrix_Enterprise_Testing_Reports
-                  path: |
-                      Report_01_Selenium.xlsx
-                      Report_02_Appium.xlsx
-                      Report_03_API_Testing.xlsx
-                      Report_04_Validation.xlsx
-                      Report_05_Performance.xlsx
+                  path: "Report_*.xlsx"
             - name: Run Selenium Suite
               run: echo "Successfully executed 300 Selenium Website tests natively."
 
