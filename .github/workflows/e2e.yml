@@ -1,4 +1,4 @@
-name: KisaanConnect E2E Tests # (Keeping the title from your picture for exact visual matching)
+name: LifeMatrix AI E2E Tests
 
 on:
     push:
