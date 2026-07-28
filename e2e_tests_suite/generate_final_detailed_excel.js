@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import fs from 'fs';
 import path from 'path';
 
@@ -6,38 +6,118 @@ function getFormattedTC(index) {
     return `TC${String(index).padStart(3, '0')}`;
 }
 
-function writeExcelFile(filename, data) {
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(data);
+async function writeStyledExcelFile(filename, headers, rows) {
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'LifeMatrix AI QA Team';
+    workbook.created = new Date();
 
-    const wscols = [
-        { wch: 12 },   // Test Case ID
-        { wch: 22 },   // Module
-        { wch: 22 },   // Sub-Module
-        { wch: 55 },   // Test Case Title
-        { wch: 35 },   // Preconditions
-        { wch: 55 },   // Test Steps
-        { wch: 55 },   // Expected Result
-        { wch: 10 },   // Priority
-        { wch: 15 },   // Test Type
-        { wch: 15 },   // Platform
-        { wch: 8 }     // Status
+    const worksheet = workbook.addWorksheet('Enterprise QA Report', {
+        views: [{ state: 'frozen', ySplit: 1 }]
+    });
+
+    // Define column widths and header alignment
+    worksheet.columns = [
+        { header: "Test Case ID", key: "tcId", width: 14 },
+        { header: "Module", key: "mod", width: 22 },
+        { header: "Sub-Module", key: "sub", width: 25 },
+        { header: "Test Case Title", key: "title", width: 55 },
+        { header: "Preconditions", key: "precond", width: 45 },
+        { header: "Test Steps", key: "steps", width: 60 },
+        { header: "Expected Result", key: "result", width: 60 },
+        { header: "Priority", key: "prio", width: 14 },
+        { header: "Test Type", key: "type", width: 20 },
+        { header: "Platform", key: "platform", width: 16 },
+        { header: "Status", key: "status", width: 12 }
     ];
-    ws['!cols'] = wscols;
 
-    XLSX.utils.book_append_sheet(wb, ws, "Test_Report");
+    // Style Header Row (Executive Deep Blue / Slate)
+    const headerRow = worksheet.getRow(1);
+    headerRow.height = 28;
+    headerRow.eachCell((cell) => {
+        cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: '1E293B' } // Dark Slate Blue
+        };
+        cell.font = {
+            name: 'Calibri',
+            size: 11,
+            bold: true,
+            color: { argb: 'FFFFFF' }
+        };
+        cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+        cell.border = {
+            top: { style: 'medium', color: { argb: '0F172A' } },
+            bottom: { style: 'medium', color: { argb: '0F172A' } },
+            left: { style: 'thin', color: { argb: '334155' } },
+            right: { style: 'thin', color: { argb: '334155' } }
+        };
+    });
+
+    // Populate Data Rows with Zebra Striping and Color Badging
+    rows.forEach((rowData, idx) => {
+        const row = worksheet.addRow(rowData);
+        row.height = 24;
+
+        const isEven = idx % 2 === 0;
+        const rowBgColor = isEven ? 'FFFFFF' : 'F8FAFC'; // Soft zebra tint
+
+        row.eachCell((cell, colNumber) => {
+            cell.font = { name: 'Calibri', size: 10, color: { argb: '334155' } };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowBgColor } };
+            cell.alignment = { vertical: 'middle', wrapText: true };
+            cell.border = {
+                top: { style: 'thin', color: { argb: 'E2E8F0' } },
+                bottom: { style: 'thin', color: { argb: 'E2E8F0' } },
+                left: { style: 'thin', color: { argb: 'E2E8F0' } },
+                right: { style: 'thin', color: { argb: 'E2E8F0' } }
+            };
+
+            // Center align ID, Priority, Test Type, Platform, Status
+            if ([1, 8, 9, 10, 11].includes(colNumber)) {
+                cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            }
+
+            // Priority Cell Badging
+            if (colNumber === 8) {
+                const val = String(cell.value);
+                if (val === 'Critical') {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FEE2E2' } };
+                    cell.font = { bold: true, color: { argb: '991B1B' } };
+                } else if (val === 'High') {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEDD5' } };
+                    cell.font = { bold: true, color: { argb: '9A3412' } };
+                } else if (val === 'Medium') {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'E0F2FE' } };
+                    cell.font = { bold: true, color: { argb: '075985' } };
+                }
+            }
+
+            // Status Cell Badging
+            if (colNumber === 11) {
+                const val = String(cell.value);
+                if (val.includes('Pass')) {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'DCFCE7' } };
+                    cell.font = { bold: true, color: { argb: '166534' } };
+                } else if (val.includes('Fail')) {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FEE2E2' } };
+                    cell.font = { bold: true, color: { argb: '991B1B' } };
+                }
+            }
+        });
+    });
 
     const folderPath = 'e2e_tests_suite';
     if (!fs.existsSync(folderPath)) {
         fs.mkdirSync(folderPath);
     }
     const filePath = path.join(folderPath, filename);
-    XLSX.writeFile(wb, filePath);
-    console.log(`✅ Generated ${filename} with ${data.length - 1} unique test cases.`);
+    await workbook.xlsx.writeFile(filePath);
+    console.log(`✨ Stylized & Formatted ${filename} with ${rows.length} unique test cases.`);
 }
 
-function generateEnterpriseExcels() {
-    console.log("🚀 Generating 5 Massive 11-Column Excel Reports (100% Unique, Zero Repetition)...");
+async function generateEnterpriseExcels() {
+    console.log("🚀 Generating 5 Stylized Enterprise Excel Reports (100% Unique, Professional Visual Formatting)...");
     const headers = [
         "Test Case ID", "Module", "Sub-Module", "Test Case Title",
         "Preconditions", "Test Steps", "Expected Result",
@@ -118,7 +198,7 @@ function generateEnterpriseExcels() {
     ];
 
     // 1. SELENIUM (300 UNIQUE TEST CASES)
-    let r1Data = [headers];
+    let r1Rows = [];
     let selCount = 1;
     const webContexts = [
         { name: "Standard Desktop Chrome (1920x1080)", step: "Verify DOM element rendering and click handler response" },
@@ -130,7 +210,7 @@ function generateEnterpriseExcels() {
                 if (selCount > 300) break;
                 const tcId = getFormattedTC(selCount);
                 const prio = (selCount % 4 === 0) ? "Critical" : (selCount % 2 === 0) ? "High" : "Medium";
-                r1Data.push([
+                r1Rows.push([
                     tcId,
                     f.mod,
                     f.sub,
@@ -149,10 +229,10 @@ function generateEnterpriseExcels() {
         }
         if (selCount > 300) break;
     }
-    writeExcelFile("Report_01_Selenium.xlsx", r1Data);
+    await writeStyledExcelFile("Report_01_Selenium.xlsx", headers, r1Rows);
 
     // 2. APPIUM (300 UNIQUE TEST CASES)
-    let r2Data = [headers];
+    let r2Rows = [];
     let appCount = 1;
     const mobileContexts = [
         { env: "Android 14 (Pixel 8 Pro)", mode: "Portrait Native Layout" },
@@ -165,7 +245,7 @@ function generateEnterpriseExcels() {
                 if (appCount > 300) break;
                 const tcId = getFormattedTC(appCount);
                 const prio = (appCount % 5 === 0) ? "Critical" : (appCount % 2 === 0) ? "High" : "Medium";
-                r2Data.push([
+                r2Rows.push([
                     tcId,
                     f.mod,
                     f.sub,
@@ -184,10 +264,10 @@ function generateEnterpriseExcels() {
         }
         if (appCount > 300) break;
     }
-    writeExcelFile("Report_02_Appium.xlsx", r2Data);
+    await writeStyledExcelFile("Report_02_Appium.xlsx", headers, r2Rows);
 
     // 3. API & BACKEND (300 UNIQUE TEST CASES)
-    let r3Data = [headers];
+    let r3Rows = [];
     let apiCount = 1;
     const apiScenarios = [
         { prefix: "Positive Flow", desc: "with valid headers and authorization bearer token" },
@@ -200,7 +280,7 @@ function generateEnterpriseExcels() {
                 if (apiCount > 300) break;
                 const tcId = getFormattedTC(apiCount);
                 const prio = (apiCount % 3 === 0) ? "Critical" : (apiCount % 2 === 0) ? "High" : "Medium";
-                r3Data.push([
+                r3Rows.push([
                     tcId,
                     f.mod,
                     f.sub,
@@ -219,10 +299,10 @@ function generateEnterpriseExcels() {
         }
         if (apiCount > 300) break;
     }
-    writeExcelFile("Report_03_API_Testing.xlsx", r3Data);
+    await writeStyledExcelFile("Report_03_API_Testing.xlsx", headers, r3Rows);
 
     // 4. DATA VALIDATION (300 UNIQUE TEST CASES)
-    let r4Data = [headers];
+    let r4Rows = [];
     let valCount = 1;
     const valAspects = [
         { aspect: "Constraint Check", detail: "Verify field level validation rules" },
@@ -235,7 +315,7 @@ function generateEnterpriseExcels() {
                 if (valCount > 300) break;
                 const tcId = getFormattedTC(valCount);
                 const prio = (valCount % 4 === 0) ? "Critical" : (valCount % 2 === 0) ? "High" : "Medium";
-                r4Data.push([
+                r4Rows.push([
                     tcId,
                     f.mod,
                     f.sub,
@@ -254,10 +334,10 @@ function generateEnterpriseExcels() {
         }
         if (valCount > 300) break;
     }
-    writeExcelFile("Report_04_Validation.xlsx", r4Data);
+    await writeStyledExcelFile("Report_04_Validation.xlsx", headers, r4Rows);
 
     // 5. PERFORMANCE & LOAD (300 UNIQUE TEST CASES)
-    let r5Data = [headers];
+    let r5Rows = [];
     let perfCount = 1;
     const perfLoadProfiles = [
         { profile: "Baseline Load", load: "10 concurrent Virtual Users (VUs)", msBase: 15 },
@@ -272,7 +352,7 @@ function generateEnterpriseExcels() {
                 const prio = (perfCount % 5 === 0) ? "Critical" : (perfCount % 2 === 0) ? "High" : "Medium";
                 const measuredMs = p.msBase + (perfCount % 35);
                 const memMb = 42 + (perfCount % 25);
-                r5Data.push([
+                r5Rows.push([
                     tcId,
                     f.mod,
                     f.sub,
@@ -291,9 +371,9 @@ function generateEnterpriseExcels() {
         }
         if (perfCount > 300) break;
     }
-    writeExcelFile("Report_05_Performance.xlsx", r5Data);
+    await writeStyledExcelFile("Report_05_Performance.xlsx", headers, r5Rows);
 
-    console.log(`\n🎉 FINISHED: Successfully generated 5 isolated Excel files with 100% unique test cases!`);
+    console.log(`\n🎉 FINISHED: Successfully generated 5 BEAUTIFULLY STYLIZED Excel files with 100% unique test cases!`);
 }
 
 generateEnterpriseExcels();
