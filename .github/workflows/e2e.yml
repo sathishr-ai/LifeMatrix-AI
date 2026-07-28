@@ -1,4 +1,4 @@
-name: LifeMatrix AI — Enterprise E2E Quality Assurance Suite (1,500 Test Assertions)
+name: LifeMatrix AI E2E Tests
 
 on:
     push:
@@ -17,7 +17,7 @@ jobs:
             - name: Upload Enterprise Testing Reports (Excel)
               uses: actions/upload-artifact@v4
               with:
-                  name: LifeMatrix_Enterprise_Testing_Reports
+                  name: LifeMatrix AI E2E Tests
                   path: e2e_tests_suite/Report_*.xlsx
             - name: Run Selenium Suite
               run: echo "Successfully executed 300 Selenium Website tests natively."
