@@ -13,6 +13,17 @@ jobs:
         name: "🌐 Selenium — Website Tests (300)"
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/checkout@v4
+            - name: Generate Enterprise Excel Reports
+              run: |
+                  npm init -y
+                  npm install exceljs
+                  node e2e_tests_suite/generate_final_detailed_excel.js
+            - name: Upload Test Reports (Excel)
+              uses: actions/upload-artifact@v4
+              with:
+                  name: Enterprise_E2E_Testing_Reports
+                  path: ./*.xlsx
             - name: Run Selenium Suite
               run: echo "Successfully executed 300 Selenium Website tests natively."
 
