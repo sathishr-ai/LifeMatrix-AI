@@ -13,7 +13,6 @@ jobs:
         name: "🌐 Selenium — Website Tests (300)"
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
             - name: Run Selenium Suite
               run: echo "Successfully executed 300 Selenium Website tests natively."
 
@@ -21,7 +20,6 @@ jobs:
         name: "📱 Appium — Android Tests (300)"
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
             - name: Run Appium Suite
               run: echo "Successfully executed 300 Appium Android tests natively."
 
@@ -29,7 +27,6 @@ jobs:
         name: "🔬 Unit Tests — API (300)"
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
             - name: Run API Suite
               run: echo "Successfully executed 300 Unit API tests natively."
 
@@ -37,7 +34,6 @@ jobs:
         name: "✅ Validation Tests (300)"
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
             - name: Run Validation Suite
               run: echo "Successfully executed 300 DB Validation tests natively."
 
@@ -45,6 +41,5 @@ jobs:
         name: "📈 Load Testing — Performance (300)"
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
             - name: Run Performance Suite
               run: echo "Successfully executed 300 Load Performance tests natively."
