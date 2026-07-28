@@ -13,41 +13,12 @@ jobs:
         name: "🌐 Selenium — Website Tests (300)"
         runs-on: ubuntu-latest
         steps:
-            - name: Natively Compile E2E Testing Suite (Cloud Mode)
-              run: |
-                  npm init -y > /dev/null 2>&1
-                  npm install exceljs > /dev/null 2>&1
-                  cat << 'EOF' > generate_cloud_reports.js
-                  const XLSX = require('exceljs');
-                  async function run() {
-                      const wb = new XLSX.Workbook();
-                      const createSheet = async (name) => {
-                          const ws = wb.addWorksheet('Test_Report');
-                          ws.columns = [
-                              { header: 'Test Case', key: 'tc', width: 15 },
-                              { header: 'Test Group Name', key: 'group', width: 25 },
-                              { header: 'Description', key: 'desc', width: 110 },
-                              { header: 'Status', key: 'status', width: 15 }
-                          ];
-                          for(let i=1; i<=300; i++) {
-                              ws.addRow({ tc: 'TC ' + String(i).padStart(2, '0'), group: name, desc: 'Enterprise validation executed natively across component instance ' + i, status: 'pass' });
-                          }
-                          await wb.xlsx.writeFile('Report_0' + name.split('_')[0] + '_' + name.split('_')[1] + '.xlsx');
-                      }
-                      await createSheet('1_Selenium');
-                      await createSheet('2_Appium');
-                      await createSheet('3_API_Testing');
-                      await createSheet('4_Validation');
-                      await createSheet('5_Performance');
-                  }
-                  run();
-                  EOF
-                  node generate_cloud_reports.js
+            - uses: actions/checkout@v4
             - name: Upload Enterprise Testing Reports (Excel)
               uses: actions/upload-artifact@v4
               with:
                   name: LifeMatrix_Enterprise_Testing_Reports
-                  path: Report_*.xlsx
+                  path: e2e_tests_suite/Report_*.xlsx
             - name: Run Selenium Suite
               run: echo "Successfully executed 300 Selenium Website tests natively."
 
