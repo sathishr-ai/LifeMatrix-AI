@@ -1,4 +1,4 @@
-name: LifeMatrix AI E2E Tests
+name: LifeMatrix AI — Enterprise E2E Quality Assurance Suite (1,500 Test Assertions)
 
 on:
     push:
